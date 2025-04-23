@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu } from 'lucide-react';
+
+import homeDefault from '../img/홈.png';
+import homeActive from '../img/홈_변경.png';
+import writeDefault from '../img/기록.png';
+import writeActive from '../img/기록_변경.png';
+import historyDefault from '../img/히스토리.png';
+import historyActive from '../img/히스토리_변경.png';
+import mypageDefault from '../img/마이페이지.png';
+import mypageActive from '../img/마이페이지_변경.png';
+
+const AppLayout = ({ children }: { children: React.ReactNode }) => {
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+
+  return (
+    <div className="min-h-screen bg-neutral-50 relative pb-20">
+      <header className="bg-white shadow p-4 text-center relative z-30">
+        <button
+          onClick={() => setOpen(!open)}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2"
+        >
+          <Menu className="w-6 h-6" style={{ color: '#3958bd' }} />
+        </button>
+        <Link to="/" onClick={() => setOpen(false)}>
+          <h1 className="text-2xl font-jua tracking-tight" style={{ color: '#3958bd' }}>
+            🐾 혼냥일기
+          </h1>
+        </Link>
+
+        {open && (
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-30 z-10" onClick={() => setOpen(false)}></div>
+            <div className="absolute top-full left-4 mt-2 w-40 bg-white shadow-xl rounded-xl p-2 z-20 flex flex-col items-start divide-y divide-gray-200">
+              <div className="w-full py-1">
+                <Link to="/" className="block px-2 py-1 text-gray-700 hover:text-[#3958bd]" onClick={() => setOpen(false)}>홈</Link>
+              </div>
+              <div className="w-full py-1">
+                <Link to="/write" className="block px-2 py-1 text-gray-700 hover:text-[#3958bd]" onClick={() => setOpen(false)}>기록하기</Link>
+              </div>
+              <div className="w-full py-1">
+                <Link to="/history" className="block px-2 py-1 text-gray-700 hover:text-[#3958bd]" onClick={() => setOpen(false)}>히스토리</Link>
+              </div>
+              <div className="w-full py-1">
+                <Link to="/mypage" className="block px-2 py-1 text-gray-700 hover:text-[#3958bd]" onClick={() => setOpen(false)}>마이페이지</Link>
+              </div>
+            </div>
+          </>
+        )}
+      </header>
+
+      <main className="relative z-0 flex-1 max-w-md w-full mx-auto p-6">
+        {children}
+      </main>
+
+      {/* 하단 네비게이션 바 */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-inner z-40">
+        <div className="max-w-md mx-auto flex justify-around py-2 text-sm font-bold">
+        <Link to="/home" className="flex flex-col items-center">
+            <img
+              src={location.pathname === '/home' ? homeActive : homeDefault}
+              alt="홈"
+              className="w-6 h-6"
+            />
+            <span className={location.pathname === '/home' ? 'text-[#3958bd]' : 'text-gray-600'}>
+              홈
+            </span>
+          </Link>
+
+          <Link to="/write" className="flex flex-col items-center">
+            <img
+              src={location.pathname === '/write' ? writeActive : writeDefault}
+              alt="기록"
+              className="w-6 h-6"
+            />
+            <span className={location.pathname === '/write' ? 'text-[#3958bd]' : 'text-gray-600'}>
+              기록
+            </span>
+          </Link>
+
+          <Link to="/history" className="flex flex-col items-center">
+            <img
+              src={location.pathname === '/history' ? historyActive : historyDefault}
+              alt="히스토리"
+              className="w-6 h-6"
+            />
+            <span className={location.pathname === '/history' ? 'text-[#3958bd]' : 'text-gray-600'}>
+              히스토리
+            </span>
+          </Link>
+
+          <Link to="/mypage" className="flex flex-col items-center">
+            <img
+              src={location.pathname === '/mypage' ? mypageActive : mypageDefault}
+              alt="마이페이지"
+              className="w-6 h-6"
+            />
+            <span className={location.pathname === '/mypage' ? 'text-[#3958bd]' : 'text-gray-600'}>
+              마이페이지
+            </span>
+          </Link>
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default AppLayout;
+
+
+
+

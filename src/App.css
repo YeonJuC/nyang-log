@@ -1,0 +1,59 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 또는 파란 배경으로 바꾸고 싶다면 */
+.react-calendar__tile--now {
+  background: rgba(57, 88, 189, 0.1) !important; /* 연한 파랑 */
+  border-radius: 0.75rem;
+  color: #000;
+}
+
+@keyframes cloudScroll {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: 1000px; /* 넓게 이동하게 하면 더 자연스러워요 */
+  }
+}
+
+.animate-cloud {
+  animation: cloudScroll 60s linear infinite;
+}
+
