@@ -13,6 +13,8 @@ import Login from './pages/Login';
 import SetupProfile from './pages/SetupProfile';
 import Landing from './pages/Landing';
 import './App.css'; 
+import ScrollToTop from './components/ScrollToTop';
+
 function AppRoutes() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -43,12 +45,7 @@ function AppRoutes() {
       const docRef = doc(db, 'users', currentUser.uid);
       const docSnap = await getDoc(docRef);
 
-      if (!docSnap.exists()) {
-        setNeedsProfile(true);
-      } else {
-        setNeedsProfile(false);
-      }
-
+      setNeedsProfile(!docSnap.exists());
       setLoading(false);
     });
 
@@ -57,39 +54,34 @@ function AppRoutes() {
 
   if (loading || visited === null) return null;
 
-  if (!user) {
-    return (
-      <Routes>
-        <Route path="*" element={<Login />} />
-      </Routes>
-    );
-  }
-
-  if (needsProfile) {
-    return (
-      <Routes>
-        <Route path="*" element={<SetupProfile onComplete={() => setNeedsProfile(false)} uid={user.uid} />} />
-      </Routes>
-    );
-  }
-
-  // 첫 진입 시 랜딩 페이지로 리디렉션
-  if (location.pathname === '/') {
-    return <Navigate to="/landing" replace />;
-  }
-
   return (
-    <Routes>
-      <Route path="/landing" element={<Landing />} />
-      <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
-      <Route path="/write" element={<AppLayout><Write /></AppLayout>} />
-      <Route path="/history" element={<AppLayout><History /></AppLayout>} />
-      <Route path="/mypage" element={<AppLayout><MyPage /></AppLayout>} />
-      <Route path="*" element={<Navigate to="/home" replace />} />
-    </Routes>
+    <>
+      <ScrollToTop /> {/* ✅ 바로 여기 넣기 */}
+
+      {!user ? (
+        <Routes>
+          <Route path="*" element={<Login />} />
+        </Routes>
+      ) : needsProfile ? (
+        <Routes>
+          <Route path="*" element={<SetupProfile onComplete={() => setNeedsProfile(false)} uid={user.uid} />} />
+        </Routes>
+      ) : location.pathname === '/' ? (
+        <Navigate to="/landing" replace />
+      ) : (
+        <Routes>
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
+          <Route path="/write" element={<AppLayout><Write /></AppLayout>} />
+          <Route path="/history" element={<AppLayout><History /></AppLayout>} />
+          <Route path="/mypage" element={<AppLayout><MyPage /></AppLayout>} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
+      )}
+    </>
   );
-  
 }
+
 
 export default function App() {
   return (

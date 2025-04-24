@@ -22,7 +22,7 @@ const characterImages: Record<string, string> = {
   ch_6,
 };
 
-const defaultTags = ['#행복', '#슬픔', '#분노', '#기쁨', '#불안', '#놀람', '#사랑', '#지루','#궁금','#심심'];
+const defaultTags = ['#행복', '#슬픔', '#분노', '#기쁨', '#불안', '#놀람', '#사랑', '#궁금','#심심'];
 
 const Write = () => {
   const [behavior, setBehavior] = useState('');
@@ -212,8 +212,9 @@ const Write = () => {
 
       {/* 감정 해시태그 */}
       <div className="max-w-md w-full mb-10 mx-auto">
-      <h4 className="text-ls font-apple_bold text-gray-600 mb-6 px-6">감정 해시태그 선택</h4>
-        <div className="grid grid-cols-5 gap-3 justify-items-center px-10">
+        <h4 className="text-sm font-apple_bold text-gray-600 mb-4 px-4">감정 해시태그 선택</h4>
+        
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-4 justify-items-center px-6">
           {defaultTags.map((tag) => (
             <button
               key={tag}
@@ -230,16 +231,19 @@ const Write = () => {
         </div>
       </div>
 
+
       {/* 내용 입력 */}
-      <div className="max-w-md w-full mb-10 mx-auto">
-        <h4 className="text-ls font-apple_bold text-gray-600 mb-6 px-6">내용 입력</h4>
-        <textarea
-          value={behavior}
-          onChange={(e) => setBehavior(e.target.value)}
-          placeholder="기록하고 싶은 냥이의 모습을 짧게 적어주세요!"
-          className="w-[400px] p-4 h-32 border border-gray-300 rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-[#3958bd] font-apple text-sm ml-4"
-          style={{ caretColor: '#3958bd' }}
-        />
+      <div className="w-full mb-10 flex justify-center">
+        <div className="w-[90%] max-w-sm">
+          <h4 className="text-sm font-apple_bold text-gray-600 mb-4 px-2">내용 입력</h4>
+          <textarea
+            value={behavior}
+            onChange={(e) => setBehavior(e.target.value)}
+            placeholder="기록하고 싶은 냥이의 모습을 짧게 적어주세요!"
+            className="w-full p-3 h-24 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3958bd] font-apple text-sm"
+            style={{ caretColor: '#3958bd' }}
+          />
+        </div>
       </div>
 
 

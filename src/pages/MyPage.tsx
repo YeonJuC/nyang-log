@@ -56,7 +56,7 @@ const MyPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <h2 className="text-xl font-apple_bigbold text-center mb-8 text-black">프로필 설정</h2>
+      <h2 className="text-xl font-apple_bigbold text-center mb-8 mt-6 text-black">프로필 설정</h2>
 
       <div className="flex flex-col items-center mb-4">
         <img
