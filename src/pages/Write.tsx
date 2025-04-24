@@ -189,18 +189,21 @@ const Write = () => {
         <span className="text-gray-400 block text-center text-sm ">(오늘 하루 저장하고 싶은 냥이의 순간을 기록해주세요.)</span>
       </div>
       
-      <div className="max-w-md w-full mb-4">
-        <h4 className="text-ls font-apple_bold text-gray-600 mb-2 px-6">이미지 선택</h4>
+      {/* 이미지 선택 제목 */}
+      <div className="max-w-md w-full mb-4 px-4 mx-auto">
+        <h4 className="text-sm font-apple_bold text-gray-600 mb-2">이미지 선택</h4>
       </div>
+
+      {/* 이미지 미리보기 */}
       {(imageData || characterImages[profileImage]) && (
-        <div className="w-[260px] aspect-square mb-6 rounded-xl overflow-hidden border border-gray-200 shadow-md">
+        <div className="w-[260px] aspect-square mb-6 rounded-xl overflow-hidden border border-gray-200 shadow-md mx-auto">
           <img src={imageData || characterImages[profileImage]} alt="미리보기" className="object-cover w-full h-full" />
         </div>
       )}
 
       {/* 이미지 선택 안내 */}
-      <label className="text-xs text-gray-400 mb-2 font-apple">(이미지를 첨부하려면 아래 버튼을 눌러주세요.)</label>
-      <label className="mb-6 cursor-pointer bg-white text-gray-700 border border-gray-100 px-4 py-2 rounded-2xl shadow hover:bg-gray-100 transition font-apple_bold text-[13px]">
+      <label className="text-xs text-gray-400 mb-2 font-apple block text-center">(이미지를 첨부하려면 아래 버튼을 눌러주세요.)</label>
+      <label className="mb-10 cursor-pointer bg-white text-gray-700 border border-gray-200 px-4 py-2 rounded-2xl shadow hover:bg-gray-100 transition font-apple_bold text-sm block w-fit mx-auto">
         파일 선택하기
         <input
           type="file"
@@ -211,15 +214,15 @@ const Write = () => {
       </label>
 
       {/* 감정 해시태그 */}
-      <div className="max-w-md w-full mb-10 mx-auto">
-        <h4 className="text-sm font-apple_bold text-gray-600 mb-4 px-4">감정 해시태그 선택</h4>
-        
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-4 justify-items-center px-6">
+      <div className="max-w-md w-full mb-10 mx-auto px-4">
+        <h4 className="text-sm font-apple_bold text-gray-600 mb-3">감정 해시태그 선택</h4>
+
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-3 justify-items-center">
           {defaultTags.map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`px-3 py-1 rounded-full text-sm font-apple border transition whitespace-nowrap
+              className={`px-4 py-1.5 rounded-full text-[14px] font-apple border transition whitespace-nowrap
                 ${selectedTags.includes(tag)
                   ? 'bg-[#3958bd] text-white'
                   : 'bg-white text-gray-600 border-gray-300'}
@@ -231,19 +234,16 @@ const Write = () => {
         </div>
       </div>
 
-
       {/* 내용 입력 */}
-      <div className="w-full mb-10 flex justify-center">
-        <div className="w-[90%] max-w-sm">
-          <h4 className="text-sm font-apple_bold text-gray-600 mb-4 px-2">내용 입력</h4>
-          <textarea
-            value={behavior}
-            onChange={(e) => setBehavior(e.target.value)}
-            placeholder="기록하고 싶은 냥이의 모습을 짧게 적어주세요!"
-            className="w-full p-3 h-24 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3958bd] font-apple text-sm"
-            style={{ caretColor: '#3958bd' }}
-          />
-        </div>
+      <div className="max-w-md w-full mb-10 mx-auto px-4">
+        <h4 className="text-sm font-apple_bold text-gray-600 mb-3">내용 입력</h4>
+        <textarea
+          value={behavior}
+          onChange={(e) => setBehavior(e.target.value)}
+          placeholder="기록하고 싶은 냥이의 모습을 짧게 적어주세요!"
+          className="w-full p-3 h-24 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3958bd] font-apple text-sm"
+          style={{ caretColor: '#3958bd' }}
+        />
       </div>
 
 
