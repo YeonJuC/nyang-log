@@ -71,7 +71,7 @@ const MyPage = () => {
       </div>
 
       {editMode && (
-        <div className="grid grid-cols-3 gap-4 justify-center mb-6 px-4 ml-4">
+        <div className="grid grid-cols-3 gap-4 justify-center mb-8 px-4 ml-6">
           {Object.entries(characterImages).map(([key, src]) => (
             <img
               key={key}
@@ -86,7 +86,7 @@ const MyPage = () => {
         </div>
       )}
       <div className="w-full h-[5px] bg-gray-100" />
-      <div className="bg-white rounded-xl p-4 w-full max-w-md mx-auto shadow-sm">
+      <div className="bg-white rounded-xl p-4 w-full max-w-md mx-auto shadow-sm mb-[100px]">
         <h2 className="text-lg text-black font-apple_bold mb-[30px] mt-8">기본정보</h2>
 
         {editMode ? (

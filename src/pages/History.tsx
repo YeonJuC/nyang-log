@@ -379,7 +379,7 @@ const History = () => {
               </div>
             </div>
           </div>
-          <div className="w-full bg-white rounded-t-3xl shadow-top px-6 py-7 flex-1 flex flex-col space-y-2">
+          <div className="w-full bg-white rounded-t-3xl shadow-top px-6 py-7 flex-1 flex flex-col space-y-2 mb-[100px]">
 
             {/* ✨ 스탬프 UI */}
             <div className="flex justify-between w-full px-4">

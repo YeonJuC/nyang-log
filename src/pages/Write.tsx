@@ -246,14 +246,15 @@ const Write = () => {
         />
       </div>
 
-
-      <button
-        onClick={saveLog}
-        className="text-white w-[360px] px-6 py-3 rounded-full shadow-md transition mb-8 mt-4 font-apple_bold hover:bg-[#2e4ca4]"
-        style={{ backgroundColor: '#3958bd' }}
-      >
-        저장하기
-      </button>
+      <div className="bg-white px-4 pb-10 mb-[100px]"> {/* ← 여백도 함께 주기 */}
+        <button
+          onClick={saveLog}
+          className="text-white w-[360px] px-6 py-3 rounded-full shadow-md transition mb-10 mt-4 font-apple_bold hover:bg-[#2e4ca4]"
+          style={{ backgroundColor: '#3958bd' }}
+        >
+          저장하기
+        </button>
+      </div>
 
       {logs.length > 0 && (
         <div className="w-full max-w-md space-y-4">
