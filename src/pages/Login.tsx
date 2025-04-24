@@ -17,9 +17,15 @@ const Login = () => {
   };
 
   return (
-    <button onClick={handleLogin}>
-      Google 로그인
-    </button>
+    <div className="flex flex-col items-center">
+          <button
+            onClick={handleLogin}
+            className="my-8 px-6 py-3 text-white font-semibold rounded-full shadow-lg hover:scale-105 transition-all"
+            style={{ backgroundColor: '#3958bd' }}
+          >
+            🚀 Google 로그인하기
+          </button>
+    </div> 
   );
 };
 
