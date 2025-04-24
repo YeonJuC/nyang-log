@@ -16,11 +16,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   return (
-    <div className="w-screen min-h-screen">
+    <div className="w-screen min-h-screen bg-white ">
       <header className="w-full bg-white shadow h-16 flex items-center justify-center relative z-30 px-4">
         <button
           onClick={() => setOpen(!open)}
-          className="absolute left-6 top-1/2 transform -translate-y-1/2"
+          className="absolute left-10 top-1/2 transform -translate-y-1/2"
         >
           <Menu className="w-6 h-6" style={{ color: '#3958bd' }} />
         </button>
