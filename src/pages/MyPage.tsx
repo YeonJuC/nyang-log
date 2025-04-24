@@ -71,7 +71,7 @@ const MyPage = () => {
       </div>
 
       {editMode && (
-        <div className="grid grid-cols-3 gap-4 justify-center mb-8 px-4 ml-6">
+        <div className="grid grid-cols-3 gap-4 justify-center mb-8 px-6 ml-8">
           {Object.entries(characterImages).map(([key, src]) => (
             <img
               key={key}
