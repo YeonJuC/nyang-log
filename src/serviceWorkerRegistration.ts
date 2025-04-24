@@ -1,5 +1,3 @@
-// src/serviceWorkerRegistration.ts
-
 export function register() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -15,14 +13,14 @@ export function register() {
           });
       });
     }
-  }
+}
   
-  export function unregister() {
+export function unregister() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
         registration.unregister();
       });
     }
-  }
+}
   
   

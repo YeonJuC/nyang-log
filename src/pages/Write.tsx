@@ -166,28 +166,31 @@ const Write = () => {
   return (
     <div className="min-h-screen p-6 flex flex-col items-center bg-[#f9fafb]">
       <h2 className="text-xl font-apple_bigbold text-center mb-8 text-black">혼냥일기 작성</h2>
-      <p className="text-left w-full max-w-md text-gray-500 font-apple text-sm px-6">함께하는 반려묘 기록</p>
-      <p className="text-left w-full max-w-md text-black-300 font-apple_bold text-xl px-6">오늘 {nickname}의 모습을 <br/>간단히 기록해볼까요?</p>
+      <p className="text-left w-full max-w-md text-gray-500 font-apple text-sm px-8 mb-1">함께하는 반려묘 기록</p>
+      <p className="text-left w-full max-w-md text-black-300 font-apple_bold text-xl px-8 mb-2">오늘 {nickname}의 모습을 <br/>간단히 기록해볼까요?</p>
 
       <div className="py-4 px-4 mb-4 flex flex-col items-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl">
+        <div className="grid grid-cols-2 gap-3 w-full max-w-md">
           {features.map((f, idx) => (
-            <div key={idx} className="bg-white rounded-2xl shadow-lg p-6 relative overflow-hidden hover:shadow-xl transition min-h-[180px]">
-              <h3 className="text-base font-apple_bigbold mb-2 text-[#3958bd]">{f.title}</h3>
-              <p className="text-[13px] text-gray-700 font-apple pr-3">{f.desc}</p>
-              <img src={f.image} alt="아이콘" className="absolute bottom-2 right-2 w-[70px] h-[70px] opacity-90" />
+            <div
+              key={idx}
+              className="bg-white rounded-2xl shadow-lg p-4 relative overflow-hidden hover:shadow-xl transition min-h-[160px]"
+            >
+              <h3 className="text-base font-apple_bigbold mb-1 text-[#3958bd]">{f.title}</h3>
+              <p className="text-[13px] text-gray-700 font-apple pr-2">{f.desc}</p>
+              <img src={f.image} alt="아이콘" className="absolute bottom-4 right-4 w-[72px] h-[72px] opacity-90" />
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-gray-100 border border-gray-200 text-sm text-gray-600 rounded-xl px-4 py-3 mb-6 max-w-md w-full font-apple">
-        ✍️ 예시: <span className="text-black">소파에 올라가서 낮잠을 잤어요</span> → <span className="text-[#3958bd]">소파에 올라가서 낮잠을 잤어요 냥~으로 변경이 되어 저장이 됩니다.</span><br />
-        <span className="text-gray-400">(오늘 하루 저장하고 싶은 냥이의 순간을 기록해주세요.)</span>
+      <div className="bg-gray-100 border border-gray-200 text-sm text-gray-600 rounded-xl px-4 py-3 mb-10 max-w-md w-200 font-apple">
+        ✍️ 예시: <span className="text-black">소파에 올라가서 낮잠을 잤어요</span><br /> → <span className="text-[#3958bd]">소파에 올라가서 낮잠을 잤어요 냥~으로 변경이 되어 저장이 됩니다.</span><br />
+        <span className="text-gray-400 block text-center text-sm ">(오늘 하루 저장하고 싶은 냥이의 순간을 기록해주세요.)</span>
       </div>
       
       <div className="max-w-md w-full mb-4">
-        <h4 className="text-sm font-apple_bold text-gray-600 mb-2">이미지 선택</h4>
+        <h4 className="text-ls font-apple_bold text-gray-600 mb-2 px-6">이미지 선택</h4>
       </div>
       {(imageData || characterImages[profileImage]) && (
         <div className="w-[260px] aspect-square mb-6 rounded-xl overflow-hidden border border-gray-200 shadow-md">
@@ -208,32 +211,37 @@ const Write = () => {
       </label>
 
       {/* 감정 해시태그 */}
-      <div className="max-w-md w-full mb-4">
-        <h4 className="text-sm font-apple_bold text-gray-600 mb-6">감정 해시태그 선택</h4>
-        <div className="flex flex-wrap gap-2 mb-4 px-6">
+      <div className="max-w-md w-full mb-10 mx-auto">
+      <h4 className="text-ls font-apple_bold text-gray-600 mb-6 px-6">감정 해시태그 선택</h4>
+        <div className="grid grid-cols-5 gap-3 justify-items-center px-10">
           {defaultTags.map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`px-3 py-1 rounded-full text-xs font-apple border transition ${selectedTags.includes(tag) ? 'bg-[#3958bd] text-white' : 'bg-white text-gray-600 border-gray-300'}`}
+              className={`px-3 py-1 rounded-full text-sm font-apple border transition whitespace-nowrap
+                ${selectedTags.includes(tag)
+                  ? 'bg-[#3958bd] text-white'
+                  : 'bg-white text-gray-600 border-gray-300'}
+              `}
             >
               {tag}
             </button>
           ))}
         </div>
       </div>
-      
-      <div className="max-w-md w-full mb-4">
-        <h4 className="text-sm font-apple_bold text-gray-600 mb-2">내용 입력</h4>
+
+      {/* 내용 입력 */}
+      <div className="max-w-md w-full mb-10 mx-auto">
+        <h4 className="text-ls font-apple_bold text-gray-600 mb-6 px-6">내용 입력</h4>
+        <textarea
+          value={behavior}
+          onChange={(e) => setBehavior(e.target.value)}
+          placeholder="기록하고 싶은 냥이의 모습을 짧게 적어주세요!"
+          className="w-[400px] p-4 h-32 border border-gray-300 rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-[#3958bd] font-apple text-sm ml-4"
+          style={{ caretColor: '#3958bd' }}
+        />
       </div>
 
-      <textarea
-        value={behavior}
-        onChange={(e) => setBehavior(e.target.value)}
-        placeholder="기록하고 싶은 냥이의 모습을 짧게 적어주세요!"
-        className="w-full max-w-md p-4 h-32 border border-gray-300 rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-[#3958bd] font-apple text-sm mb-4"
-        style={{ caretColor: '#3958bd' }}
-      />
 
       <button
         onClick={saveLog}

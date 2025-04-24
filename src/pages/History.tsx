@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect,  useRef,  useState } from 'react';
 import { auth, db } from '../firebase';
 import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import Calendar from 'react-calendar';
@@ -113,6 +113,10 @@ const History = () => {
   const [deleteTarget, setDeleteTarget] = useState<LogEntry | null>(null);
   const [profileImage, setProfileImage] = useState('ch_1');
 
+  const [openModal, setOpenModal] = useState<null | 'calendar' | 'chart'>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  
   useEffect(() => {
     const fetchProfileImage = async () => {
       const user = auth.currentUser;
@@ -154,6 +158,15 @@ const History = () => {
         
         setLogs(data);
         setActiveDates(data.map((d) => d.date));
+
+        const handleClickOutside = (e: Event) => {
+          if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+            setOpenModal(null);
+          }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
 
         const emotionMap: Record<string, string> = {};
         data.forEach((entry) => {
@@ -245,292 +258,308 @@ const History = () => {
   return (
     <div className="min-h-screen py-6 flex flex-col bg-[#5976D7]">
       <div className="w-full max-w-md mb-6 relative">
-        <h2 className="text-xl font-apple_bigbold text-white text-center">혼냥일기 히스토리</h2>
-        <button
-            onClick={() => setShowCalendar(!showCalendar)}
-            className="absolute right-8 top-1 text-white hover:text-[#dbe5ff] transition"
-          >
-            <CalendarDays className="w-6 h-6" />
-          </button>
-          <button
-            onClick={() => setShowChartModal(prev => !prev)}
-            className="absolute left-8 top-1 text-white hover:text-[#dbe5ff] transition"
-          >
-            <BarChartIcon className="w-6 h-6" />
-          </button>
-      </div>
-      {showChartModal && (
-        <div className="mb-6 w-full flex justify-center">
-          <div className="bg-white w-[90%] max-w-md rounded-xl p-4 shadow">
-            <h3 className="text-lg font-apple_bold text-gray-700 mb-4 text-center">최근 해시태그 차트</h3>
+      <h2 className="text-xl font-apple_bigbold text-white text-center">혼냥일기 히스토리</h2>
 
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={tagChartData}>
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 11, fill: '#444', fontFamily: 'AppleSDGothicNeoB00' }}
-                  tickFormatter={(v) => v.replace('#', '')}
-                  axisLine={false}
-                  tickLine={false}
+      <button
+        onClick={() =>
+          setOpenModal((prev) => (prev === 'calendar' ? null : 'calendar'))
+        }
+        className="absolute right-8 top-1 text-white hover:text-[#dbe5ff] transition"
+      >
+        <CalendarDays className="w-6 h-6" />
+      </button>
+
+      <button
+        onClick={() =>
+          setOpenModal((prev) => (prev === 'chart' ? null : 'chart'))
+        }
+        className="absolute left-8 top-1 text-white hover:text-[#dbe5ff] transition"
+      >
+        <BarChartIcon className="w-6 h-6" />
+      </button>
+
+      {/* 모달들 */}
+      <div className="flex flex-col items-center gap-6">
+        <div ref={modalRef} className="absolute top-12 left-0 right-0 px-0 z-10">
+          {openModal === 'calendar' && (
+            <div className="mb-6 w-full flex justify-center">
+              <div className="bg-white w-[90%] max-w-md rounded-xl p-4 shadow">
+                <Calendar
+                  onChange={handleDateChange}
+                  tileContent={({ date, view }) => {
+                    const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                    const bgColor = emotionMap[dateString];
+
+                    if (view === 'month') {
+                      return (
+                        <div className="flex justify-center items-center mt-1 relative">
+                          {activeDates.includes(dateString) && (
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: bgColor }} />
+                          )}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                  calendarType="gregory"
+                  className="w-full text-sm font-apple border-none shadow-none"
+                  tileClassName="!border-none"
                 />
-                <Tooltip
-                  cursor={{ fill: 'transparent' }}
-                  content={({ active, payload }) =>
-                    active && payload && payload.length ? (
-                      <div className="bg-white border border-gray-200 rounded-xl px-3 py-2 shadow font-apple text-sm text-gray-700">
-                        <p><strong>{payload[0].payload.name.replace('#','')}</strong>: {payload[0].value}회</p>
-                      </div>
-                    ) : null
-                  }
-                />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                  {tagChartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={gradientColors[index % gradientColors.length]}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
-
-      {showCalendar && (
-        <div className="mb-6 flex justify-center">
-          <Calendar
-            onChange={handleDateChange}
-            tileContent={({ date, view }) => {
-              const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-              const bgColor = emotionMap[dateString] || undefined;
-
-              if (view === 'month') {
-                return (
-                  <div className="flex justify-center items-center mt-1 relative">
-                    {activeDates.includes(dateString) && (
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: bgColor }} />
-                    )}
-                  </div>
-                );
-              }
-              return null;
-            }}
-            calendarType="gregory"
-            className="rounded-xl shadow p-2 text-sm w-[280px]"
-          />
-        </div>
-      )}
-
-      {/* ✨ 감정 문장 + 캐릭터 말풍선 */}
-      <div className="w-full flex flex-col items-center justify-center gap-3 px-2 mt-6 mb-6">
-        <div className="relative w-full h-70 overflow-hidden flex flex-col justify-end items-center">
-          
-          {/* 구름 배경 */}
-          <div
-            className="absolute inset-0 bg-repeat-x bg-bottom animate-cloud"
-            style={{
-              backgroundImage: "url('/img/cloud-bg.png')",
-              backgroundSize: 'cover',
-              opacity: 0.4,
-              zIndex: 0
-            }}
-          ></div>
-
-          {/* 말풍선 */}
-          <div className="relative z-10 mb-3 flex justify-center w-full">
-            <div className="bg-[#f4f6ff] text-[#3958bd] text-sm rounded-2xl px-6 py-4 font-apple_bold shadow leading-relaxed max-w-[80%] text-center">
-              <span className="absolute left-1/2 transform -translate-x-1/2 bottom-[-12px] w-0 h-0 border-t-[12px] border-t-[#f4f6ff] border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent"></span>
-              <span className="text-[18px]">“</span>{todayEmotionMessage}<span className="text-[18px]">”</span>
-            </div>
-          </div>
-
-          {/* 캐릭터 이미지 */}
-          <div className="relative z-10 flex justify-center items-end h-full">
-            <img
-              src={characterImages[profileImage]}
-              alt="고양이 캐릭터"
-              className="w-48 object-contain"
-            />
-          </div>
-        </div>
-      </div>
-
-  <div className="w-full bg-white rounded-t-3xl shadow-top px-6 py-7 flex-1 flex flex-col space-y-2">
-
-        {/* ✨ 스탬프 UI */}
-        <div className="flex justify-between w-full px-4">
-            {recentDays.map(({ date, day }) => {
-              const isChecked = recordedDates.includes(date);
-              return (
-                <div key={date} className="flex flex-col items-center">
-                  <span className="text-[14px] font-medium text-gray-500 mb-2">{day}</span>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition duration-200
-                    ${isChecked ? 'bg-white border-[#3958bd] text-[#3958bd]' : 'bg-gray-100 border-gray-300 text-gray-400'}`}>
-                    {isChecked && <Check className="w-4 h-4" strokeWidth={4} />}
-                  </div>
-                </div>
-              );
-            })}
-        </div>  
-
-        <div className="w-full max-w-md text-sm text-gray-600 font-apple mb-4 text-center">
-          {selectedDate && <p>선택된 날짜: <span className="text-[#3958bd] font-apple_bold">{selectedDate}</span></p>}
-        </div>
-
-        <div className="w-full max-w-md">
-          {visibleLogs.length === 0 ? (
-            <p className="text-gray-500 font-apple text-center">기록이 아직 없어요 😿</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {visibleLogs.map((log, i) => (
-                <div key={i} className="bg-white rounded-xl shadow p-4 relative group">
-                  {log.image && log.image !== '' && (
-                    <div className="w-full aspect-square overflow-hidden rounded-xl mb-3">
-                      <img src={log.image} alt={`냥이사진 ${i}`} className="object-cover w-full h-full" />
-                    </div>
-                  )}
-
-                  {log.tags && log.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-2 text-xs text-[#3958bd] font-apple">
-                      {log.tags.map((tag, j) => <span key={j}>#{tag.replace('#', '')}</span>)}
-                    </div>
-                  )}
-
-                  <p className="text-gray-700 whitespace-pre-line font-apple_bold text-sm mb-1">{log.text}</p>
-                  <p className="text-xs text-gray-400 font-apple">{log.date}</p>
-
-                  <div className="absolute bottom-2 right-2 flex gap-2 opacity-60 group-hover:opacity-100 transition">
-                    <button onClick={() => handleEdit(log)}>
-                      <Pencil className="w-4 h-4 text-gray-500 hover:text-[#3958bd]" />
-                    </button>
-                    <button onClick={() => handleDelete(log)}>
-                      <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+              </div>
             </div>
           )}
-        </div>
 
-        {/* 수정 모달 */}
-        {editMode && editTarget && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm shadow-lg">
-              <h3 className="text-lg font-apple_bold text-gray-700 mb-4 text-center">내용 & 해시태그 수정</h3>
+          {openModal === 'chart' && (
+            <div className="mb-6 w-full flex justify-center">
+              <div className="bg-white w-[90%] max-w-md rounded-xl p-4 shadow">
+                <h3 className="text-lg font-apple_bold text-gray-700 mb-4 text-center">최근 해시태그 차트</h3>
 
-              <textarea
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                placeholder="수정할 내용을 입력해주세요"
-                className="w-full p-3 border border-gray-300 rounded-lg text-sm font-apple mb-4 focus:outline-none focus:ring-2 focus:ring-[#3958bd]"
-                rows={3}
-              />
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={tagChartData}>
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 11, fill: '#444', fontFamily: 'AppleSDGothicNeoB00' }}
+                      tickFormatter={(v) => v.replace('#', '')}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      cursor={{ fill: 'transparent' }}
+                      content={({ active, payload }) =>
+                        active && payload && payload.length ? (
+                          <div className="bg-white border border-gray-200 rounded-xl px-3 py-2 shadow font-apple text-sm text-gray-700">
+                            <p><strong>{payload[0].payload.name.replace('#','')}</strong>: {payload[0].value}회</p>
+                          </div>
+                        ) : null
+                      }
+                    />
+                    <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                      {tagChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={gradientColors[index % gradientColors.length]}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+          {/* ✨ 감정 문장 + 캐릭터 말풍선 */}
+          <div className="w-full flex flex-col items-center justify-center gap-3 px-2 mt-6 mb-6">
+            <div className="relative w-full h-70 overflow-hidden flex flex-col justify-end items-center">
+              
+              {/* 구름 배경 */}
+              <div
+                className="absolute inset-0 bg-repeat-x bg-bottom animate-cloud"
+                style={{
+                  backgroundImage: "url('/img/cloud-bg.png')",
+                  backgroundSize: 'cover',
+                  opacity: 0.4,
+                  zIndex: 0
+                }}
+              ></div>
 
-              <div className="flex flex-wrap gap-2 mb-6">
-              {defaultTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() =>
-                    setEditTags((prev) =>
-                      prev.includes(tag)
-                        ? prev.filter((t) => t !== tag)
-                        : [...prev.filter((t) => defaultTags.includes(t)), tag]
-                    )
-                  }
-                  className={`px-3 py-1 rounded-full text-xs font-apple border transition ${
-                    editTags.includes(tag)
-                      ? 'bg-[#3958bd] text-white'
-                      : 'bg-white text-gray-600 border-gray-300'
-                  }`}
-                >
-                  #{tag}
-                </button>
-              ))}
+              {/* 말풍선 */}
+              <div className="relative z-10 mb-3 flex justify-center w-full">
+                <div className="bg-[#f4f6ff] text-[#3958bd] text-sm rounded-2xl px-6 py-4 font-apple_bold shadow leading-relaxed max-w-[80%] text-center">
+                  <span className="absolute left-1/2 transform -translate-x-1/2 bottom-[-12px] w-0 h-0 border-t-[12px] border-t-[#f4f6ff] border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent"></span>
+                  <span className="text-[18px]">“</span>{todayEmotionMessage}<span className="text-[18px]">”</span>
+                </div>
               </div>
 
-              <div className="flex justify-end gap-2">
-                <button className="text-sm px-4 py-2 rounded-lg bg-gray-200 text-gray-600 font-apple" onClick={() => {
-                  setEditMode(false);
-                  setEditTarget(null);
-                  setEditTags([]);
-                  setEditText('');
-                }}>취소</button>
-                <button className="text-sm px-4 py-2 rounded-lg bg-[#3958bd] text-white font-apple_bold" onClick={async () => {
-                  const user = auth.currentUser;
-                  if (!user || !editTarget) return;
-                  const logRef = doc(db, 'logs', user.uid, 'entries', editTarget.docId);
-                  try {
-                    await updateDoc(logRef, {
-                      text: editText,
-                      tags: editTags,
-                    });
-                    setLogs((prev) =>
-                      prev.map((entry) =>
-                        entry.docId === editTarget.docId
-                          ? { ...entry, text: editText, tags: editTags }
-                          : entry
-                      )
-                    );
-                    alert('수정 완료!');
-                  } catch (e) {
-                    console.error('수정 실패:', e);
-                    alert('수정 중 오류 발생');
-                  } finally {
-                    setEditMode(false);
-                    setEditTarget(null);
-                    setEditTags([]);
-                    setEditText('');
-                  }
-                }}>확인</button>
+              {/* 캐릭터 이미지 */}
+              <div className="relative z-10 flex justify-center items-end h-full">
+                <img
+                  src={characterImages[profileImage]}
+                  alt="고양이 캐릭터"
+                  className="w-48 object-contain"
+                />
               </div>
             </div>
           </div>
-        )}
+          <div className="w-full bg-white rounded-t-3xl shadow-top px-6 py-7 flex-1 flex flex-col space-y-2">
 
-        {/* 삭제 모달 */}
-        {deleteTarget && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm shadow-lg">
-              <h3 className="text-lg font-apple_bold text-gray-700 mb-4 text-center">정말 삭제할까요?</h3>
-              <p className="text-sm text-center text-gray-500 font-apple mb-4">삭제된 기록은 복구할 수 없어요.</p>
+            {/* ✨ 스탬프 UI */}
+            <div className="flex justify-between w-full px-4">
+                {recentDays.map(({ date, day }) => {
+                  const isChecked = recordedDates.includes(date);
+                  return (
+                    <div key={date} className="flex flex-col items-center">
+                      <span className="text-[14px] font-medium text-gray-500 mb-2">{day}</span>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition duration-200
+                        ${isChecked ? 'bg-white border-[#3958bd] text-[#3958bd]' : 'bg-gray-100 border-gray-300 text-gray-400'}`}>
+                        {isChecked && <Check className="w-4 h-4" strokeWidth={4} />}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>  
 
-              {deleteTarget.image && (
-                <div className="w-full aspect-square overflow-hidden rounded-lg border mb-3">
-                  <img src={deleteTarget.image} alt="삭제 미리보기" className="object-cover w-full h-full" />
+            <div className="w-full max-w-md text-sm text-gray-600 font-apple mb-4 text-center">
+              {selectedDate && <p>선택된 날짜: <span className="text-[#3958bd] font-apple_bold">{selectedDate}</span></p>}
+            </div>
+
+            <div className="w-full max-w-md">
+              {visibleLogs.length === 0 ? (
+                <p className="text-gray-500 font-apple text-center">기록이 아직 없어요 😿</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  {visibleLogs.map((log, i) => (
+                    <div key={i} className="bg-white rounded-xl shadow p-4 relative group">
+                      {log.image && log.image !== '' && (
+                        <div className="w-full aspect-square overflow-hidden rounded-xl mb-3">
+                          <img src={log.image} alt={`냥이사진 ${i}`} className="object-cover w-full h-full" />
+                        </div>
+                      )}
+
+                      {log.tags && log.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2 text-xs text-[#3958bd] font-apple">
+                          {log.tags.map((tag, j) => <span key={j}>#{tag.replace('#', '')}</span>)}
+                        </div>
+                      )}
+
+                      <p className="text-gray-700 whitespace-pre-line font-apple_bold text-sm mb-1">{log.text}</p>
+                      <p className="text-xs text-gray-400 font-apple">{log.date}</p>
+
+                      <div className="absolute bottom-2 right-2 flex gap-2 opacity-60 group-hover:opacity-100 transition">
+                        <button onClick={() => handleEdit(log)}>
+                          <Pencil className="w-4 h-4 text-gray-500 hover:text-[#3958bd]" />
+                        </button>
+                        <button onClick={() => handleDelete(log)}>
+                          <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
-              <p className="text-xs text-gray-600 font-apple mb-6 text-center whitespace-pre-line">
-                "{deleteTarget.text.length > 80 ? deleteTarget.text.slice(0, 80) + '...' : deleteTarget.text}"
-              </p>
-
-              <div className="flex justify-end gap-2">
-                <button className="text-sm px-4 py-2 rounded-lg bg-gray-200 text-gray-600 font-apple" onClick={() => setDeleteTarget(null)}>
-                  취소
-                </button>
-                <button className="text-sm px-4 py-2 rounded-lg bg-red-500 text-white font-apple_bold" onClick={async () => {
-                  const user = auth.currentUser;
-                  if (!user || !deleteTarget) return;
-                  const logRef = doc(db, 'logs', user.uid, 'entries', deleteTarget.docId);
-                  try {
-                    await deleteDoc(logRef);
-                    setLogs((prev) => prev.filter((entry) => entry.docId !== deleteTarget.docId));
-                    alert('삭제 완료!');
-                  } catch (e) {
-                    console.error('삭제 실패:', e);
-                    alert('삭제 중 오류 발생');
-                  } finally {
-                    setDeleteTarget(null);
-                  }
-                }}>
-                  삭제하기
-                </button>
-              </div>
             </div>
-          </div>
-        )}    
-      </div>    
+
+            {/* 수정 모달 */}
+            {editMode && editTarget && (
+              <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm shadow-lg">
+                  <h3 className="text-lg font-apple_bold text-gray-700 mb-4 text-center">내용 & 해시태그 수정</h3>
+
+                  <textarea
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    placeholder="수정할 내용을 입력해주세요"
+                    className="w-full p-3 border border-gray-300 rounded-lg text-sm font-apple mb-4 focus:outline-none focus:ring-2 focus:ring-[#3958bd]"
+                    rows={3}
+                  />
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                  {defaultTags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() =>
+                        setEditTags((prev) =>
+                          prev.includes(tag)
+                            ? prev.filter((t) => t !== tag)
+                            : [...prev.filter((t) => defaultTags.includes(t)), tag]
+                        )
+                      }
+                      className={`px-3 py-1 rounded-full text-xs font-apple border transition ${
+                        editTags.includes(tag)
+                          ? 'bg-[#3958bd] text-white'
+                          : 'bg-white text-gray-600 border-gray-300'
+                      }`}
+                    >
+                      #{tag}
+                    </button>
+                  ))}
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <button className="text-sm px-4 py-2 rounded-lg bg-gray-200 text-gray-600 font-apple" onClick={() => {
+                      setEditMode(false);
+                      setEditTarget(null);
+                      setEditTags([]);
+                      setEditText('');
+                    }}>취소</button>
+                    <button className="text-sm px-4 py-2 rounded-lg bg-[#3958bd] text-white font-apple_bold" onClick={async () => {
+                      const user = auth.currentUser;
+                      if (!user || !editTarget) return;
+                      const logRef = doc(db, 'logs', user.uid, 'entries', editTarget.docId);
+                      try {
+                        await updateDoc(logRef, {
+                          text: editText,
+                          tags: editTags,
+                        });
+                        setLogs((prev) =>
+                          prev.map((entry) =>
+                            entry.docId === editTarget.docId
+                              ? { ...entry, text: editText, tags: editTags }
+                              : entry
+                          )
+                        );
+                        alert('수정 완료!');
+                      } catch (e) {
+                        console.error('수정 실패:', e);
+                        alert('수정 중 오류 발생');
+                      } finally {
+                        setEditMode(false);
+                        setEditTarget(null);
+                        setEditTags([]);
+                        setEditText('');
+                      }
+                    }}>확인</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 삭제 모달 */}
+            {deleteTarget && (
+              <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm shadow-lg">
+                  <h3 className="text-lg font-apple_bold text-gray-700 mb-4 text-center">정말 삭제할까요?</h3>
+                  <p className="text-sm text-center text-gray-500 font-apple mb-4">삭제된 기록은 복구할 수 없어요.</p>
+
+                  {deleteTarget.image && (
+                    <div className="w-full aspect-square overflow-hidden rounded-lg border mb-3">
+                      <img src={deleteTarget.image} alt="삭제 미리보기" className="object-cover w-full h-full" />
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-600 font-apple mb-6 text-center whitespace-pre-line">
+                    "{deleteTarget.text.length > 80 ? deleteTarget.text.slice(0, 80) + '...' : deleteTarget.text}"
+                  </p>
+
+                  <div className="flex justify-end gap-2">
+                    <button className="text-sm px-4 py-2 rounded-lg bg-gray-200 text-gray-600 font-apple" onClick={() => setDeleteTarget(null)}>
+                      취소
+                    </button>
+                    <button className="text-sm px-4 py-2 rounded-lg bg-red-500 text-white font-apple_bold" onClick={async () => {
+                      const user = auth.currentUser;
+                      if (!user || !deleteTarget) return;
+                      const logRef = doc(db, 'logs', user.uid, 'entries', deleteTarget.docId);
+                      try {
+                        await deleteDoc(logRef);
+                        setLogs((prev) => prev.filter((entry) => entry.docId !== deleteTarget.docId));
+                        alert('삭제 완료!');
+                      } catch (e) {
+                        console.error('삭제 실패:', e);
+                        alert('삭제 중 오류 발생');
+                      } finally {
+                        setDeleteTarget(null);
+                      }
+                    }}>
+                      삭제하기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}    
+          </div>  
+        </div>
+      </div>
+    </div>
+
+
+    
     </div>
   );
 };

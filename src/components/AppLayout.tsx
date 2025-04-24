@@ -16,11 +16,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-neutral-50 relative pb-20">
-      <header className="bg-white shadow p-4 text-center relative z-30">
+    <div className="w-screen min-h-screen">
+      <header className="w-full bg-white shadow h-16 flex items-center justify-center relative z-30 px-4">
         <button
           onClick={() => setOpen(!open)}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2"
+          className="absolute left-6 top-1/2 transform -translate-y-1/2"
         >
           <Menu className="w-6 h-6" style={{ color: '#3958bd' }} />
         </button>
@@ -51,12 +51,15 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       </header>
 
-      <main className="relative z-0 flex-1 max-w-md w-full mx-auto p-6">
+      <main
+        className="relative z-0 flex-1 w-full"
+        style={{ padding: '0px', margin: '0px', maxWidth: '100%' }}
+      >
         {children}
       </main>
 
       {/* 하단 네비게이션 바 */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-inner z-40">
+      <nav className="w-full fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-inner z-40">
         <div className="max-w-md mx-auto flex justify-around py-2 text-sm font-bold">
         <Link to="/home" className="flex flex-col items-center">
             <img

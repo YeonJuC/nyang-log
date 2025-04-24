@@ -1,14 +1,14 @@
 {
   "short_name": "냥찰일지",
-  "name": "냥찰일지 - 반려묘 일기",
+  "name": "혼자 있는 냥이 일기 앱",
   "icons": [
     {
-      "src": "icon-192x192.png",
+      "src": "/icons/icon-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "icon-512x512.png",
+      "src": "/icons/icon-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
@@ -18,3 +18,5 @@
   "theme_color": "#5976D7",
   "background_color": "#ffffff"
 }
+
+

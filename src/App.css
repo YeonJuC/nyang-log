@@ -57,3 +57,15 @@
   animation: cloudScroll 60s linear infinite;
 }
 
+body, html, #root {
+  margin: 0;
+  padding: 0;
+}
+.react-calendar {
+  border: none !important;
+  box-shadow: none !important;
+}
+.react-calendar__tile {
+  border: none !important;
+}
+

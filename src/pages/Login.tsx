@@ -1,28 +1,27 @@
-// src/pages/Login.tsx
-import { signInWithPopup } from 'firebase/auth';
-import { auth, provider } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
 
 const Login = () => {
+  const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
+  const handleLogin = async () => {
     try {
-      await signInWithPopup(auth, provider);
-      // 로그인 후 자동으로 App.tsx에서 상태 확인됨
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      console.log('로그인 성공:', result.user);
+      navigate('/');
     } catch (error) {
       console.error('로그인 실패:', error);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f4f6fc]">
-      <button
-        onClick={handleGoogleLogin}
-        className="px-6 py-3 bg-[#3958bd] text-white font-bold rounded-full shadow-lg"
-      >
-        🚀 Google 로그인하기
-      </button>
-    </div>
+    <button onClick={handleLogin}>
+      Google 로그인
+    </button>
   );
 };
 
 export default Login;
+
