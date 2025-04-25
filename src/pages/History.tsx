@@ -68,15 +68,18 @@ const History = () => {
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [showDetail, setShowDetail] = useState<LogEntry | null>(null);
 
-  const handleEdit = (log: LogEntry) => {
+  const handleEdit = (log: LogEntry, e?: React.MouseEvent) => {
+    e?.stopPropagation(); // 클릭 이벤트 버블링 방지
+    setShowDetail(null);  // 상세보기 닫기
     setEditTarget(log);
     setEditText(log.text);
     setEditTags([...(log.tags ?? [])]);
     setEditMode(true);
   };
   
-  
-  const handleDelete = (log: any) => {
+  const handleDelete = (log: any, e?: React.MouseEvent) => {
+    e?.stopPropagation(); // 클릭 이벤트 버블링 방지
+    setShowDetail(null);  // 상세보기 닫기
     setDeleteTarget(log);
   };
   
@@ -530,12 +533,12 @@ const History = () => {
                 <p className="text-xs text-gray-500">{log.date}</p>
 
                 {/* 수정 / 삭제 버튼 */}
-                <div className="absolute bottom-2 right-2 flex gap-2 opacity-60 group-hover:opacity-100 transition">
-                  <button onClick={() => handleEdit(log)}>
-                    <Pencil className="w-4 h-4 text-gray-500 hover:text-[#3958bd]" />
+                <div className="absolute bottom-4 right-5 flex gap-4 opacity-60 group-hover:opacity-100 transition">
+                  <button onClick={(e) => handleEdit(log, e)}>
+                    <Pencil className="w-5 h-5 text-gray-500 hover:text-[#3958bd]" />
                   </button>
-                  <button onClick={() => handleDelete(log)}>
-                    <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500" />
+                  <button onClick={(e) => handleDelete(log, e)}>
+                    <Trash2 className="w-5 h-5 text-gray-500 hover:text-red-500" />
                   </button>
                 </div>
               </div>
