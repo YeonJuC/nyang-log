@@ -16,11 +16,17 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   return (
-    <div className="w-screen min-h-screen bg-white ">
-      <header className="w-full bg-white shadow h-16 flex items-center justify-center relative z-30 px-4">
+    <div className="w-screen min-h-screen">
+      {/* ✅ 상태바 흰 배경 */}
+      <div
+        className="fixed top-0 left-0 w-full bg-white z-50"
+        style={{ height: 'env(safe-area-inset-top, 24px)' }}
+      />
+
+      <header className="w-full bg-white shadow h-16 flex items-center justify-center relative z-30 px-4 pt-[env(safe-area-inset-top, 24px)]">
         <button
           onClick={() => setOpen(!open)}
-          className="absolute left-10 top-1/2 transform -translate-y-1/2"
+          className="absolute left-6 top-1/2 transform -translate-y-1/2"
         >
           <Menu className="w-6 h-6" style={{ color: '#3958bd' }} />
         </button>
@@ -33,7 +39,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         {open && (
           <>
             <div className="fixed inset-0 bg-black bg-opacity-30 z-10" onClick={() => setOpen(false)}></div>
-            <div className="absolute top-full left-4 mt-2 w-40 bg-white shadow-xl rounded-xl p-2 z-20 flex flex-col items-start divide-y divide-gray-200">
+            <div className="absolute top-full left-6 mt-2 w-40 bg-white shadow-xl rounded-xl p-2 z-20 flex flex-col items-start divide-y divide-gray-200">
               <div className="w-full py-1">
                 <Link to="/" className="block px-2 py-1 text-gray-700 hover:text-[#3958bd]" onClick={() => setOpen(false)}>홈</Link>
               </div>
@@ -60,8 +66,8 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* 하단 네비게이션 바 */}
       <nav className="w-full fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-inner z-40">
-        <div className="max-w-md mx-auto flex justify-around py-2 text-sm font-bold">
-        <Link to="/home" className="flex flex-col items-center">
+        <div className="max-w-md mx-auto flex justify-around py-2 text-sm font-bold mt-2">
+          <Link to="/home" className="flex flex-col items-center">
             <img
               src={location.pathname === '/home' ? homeActive : homeDefault}
               alt="홈"
@@ -111,7 +117,3 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default AppLayout;
-
-
-
-

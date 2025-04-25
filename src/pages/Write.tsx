@@ -252,7 +252,7 @@ const Write = () => {
         />
       </div>
 
-      <div className="bg-[#f9fafb] px-4 pb-10 mb-[100px]"> {/* ← 여백도 함께 주기 */}
+      <div className="bg-[#f9fafb] px-4 pb-10 mb-[20px]"> {/* ← 여백도 함께 주기 */}
         <button
           onClick={saveLog}
           className="text-white w-[360px] px-6 py-3 rounded-full shadow-md transition mb-10 mt-4 font-apple_bold hover:bg-[#2e4ca4]"
