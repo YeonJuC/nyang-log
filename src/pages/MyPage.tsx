@@ -35,6 +35,7 @@ const MyPage = () => {
         setSpecies(data.species || '');
         setSelectedImg(data.profileImage || 'ch_1');
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     fetchProfile();
   }, []);
@@ -42,15 +43,21 @@ const MyPage = () => {
   const handleSave = async () => {
     const user = auth.currentUser;
     if (!user) return alert('로그인이 필요합니다.');
+  
     const profile = { catName, nickname, age, species, profileImage: selectedImg };
+  
     try {
       await setDoc(doc(db, 'users', user.uid), profile);
+  
+      // ✅ 저장 완료 후 맨 위로 스크롤
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  
       setEditMode(false);
       alert('프로필이 저장되었습니다!');
     } catch (e) {
       console.error('저장 오류:', e);
     }
-  };
+  };  
 
   const selectedImgSrc = characterImages[selectedImg];
 
@@ -122,7 +129,7 @@ const MyPage = () => {
             />
             <button
               onClick={handleSave}
-              className="w-full mt-4 bg-[#3958bd] text-white py-2 rounded-full text-sm font-semibold !mb-[50px]"
+              className="w-full !mt-[30px] bg-[#3958bd] text-white py-4 rounded-full text-sm font-semibold !mb-[70px]"
             >
               저장하기
             </button>

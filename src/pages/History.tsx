@@ -517,9 +517,6 @@ const History = () => {
                   </div>
                 )}
 
-                <p className="text-sm font-semibold mb-1 whitespace-pre-line">{log.text}</p>
-                <p className="text-xs text-gray-500">{log.date}</p>
-
                 {log.tags && log.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2 text-xs text-[#3958bd] font-apple">
                     {log.tags.map((tag: string, j: Key | null | undefined) => (
@@ -527,6 +524,9 @@ const History = () => {
                     ))}
                   </div>
                 )}
+
+                <p className="text-sm font-semibold mb-1 whitespace-pre-line">{log.text}</p>
+                <p className="text-xs text-gray-500">{log.date}</p>
 
                 {/* 수정 / 삭제 버튼 */}
                 <div className="absolute bottom-2 right-2 flex gap-2 opacity-60 group-hover:opacity-100 transition">
