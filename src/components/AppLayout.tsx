@@ -17,6 +17,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="w-screen min-h-screen">
+      <div className="fixed top-0 left-0 w-full bg-white z-50" style={{ height: 'env(safe-area-inset-top, 24px)' }} />
       {/* ✅ 상태바 흰 배경 */}
       <div
         className="fixed top-0 left-0 w-full bg-white z-50"

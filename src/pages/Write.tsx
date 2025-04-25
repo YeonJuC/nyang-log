@@ -12,6 +12,7 @@ import ch_3 from '../img/ch_3.png';
 import ch_4 from '../img/ch_4.png';
 import ch_5 from '../img/ch_5.png';
 import ch_6 from '../img/ch_6.png';
+import { useNavigate } from 'react-router-dom';
 
 const characterImages: Record<string, string> = {
   ch_1,
@@ -31,6 +32,7 @@ const Write = () => {
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchNickname = async () => {
@@ -93,19 +95,13 @@ const Write = () => {
 
     try {
       await setDoc(entryDoc, newEntry);
-    
       alert("기록 완료!");
-      setBehavior('');
-      setImageData('');
-      setSelectedTags([]);
-      setLogs((prev) => [newEntry, ...prev]);
-    
-      localStorage.setItem('todayLog', JSON.stringify(newEntry));
-      localStorage.setItem('logs', JSON.stringify([newEntry, ...logs]));
+      // Navigate to homepage after saving
+      navigate('/home');
     } catch (e) {
       console.error(e);
       alert("저장 실패");
-    }    
+    }  
   };
 
   const resizeImage = (file: File, maxWidth = 800): Promise<string> => {
