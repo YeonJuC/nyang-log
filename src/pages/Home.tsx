@@ -124,7 +124,7 @@ const Home = () => {
       </div>
 
       {user && (
-        <div className="w-full bg-[#5976D7] flex flex-col items-center px-0 pb-10 rounded-tl-3xl rounded-tr-3xl shadow-[0_-4px_10px_rgba(0,0,0,0.15)] mb-20">
+        <div className="w-full bg-[#5976D7] flex flex-col items-center px-0 pb-10 rounded-tl-3xl rounded-tr-3xl shadow-[0_-4px_10px_rgba(0,0,0,0.15)] mb-20 min-h-[calc(100vh-150px)]">
           <div className="w-full max-w-md text-center space-y-6 px-4 pt-10">
             <h1 className="text-left text-white font-apple_bigbold px-5">• 일기 자동 생성</h1>
 
