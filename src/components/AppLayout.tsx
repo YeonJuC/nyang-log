@@ -11,6 +11,8 @@ import historyActive from '../img/히스토리_변경.png';
 import mypageDefault from '../img/마이페이지.png';
 import mypageActive from '../img/마이페이지_변경.png';
 import ScrollToTop from './ScrollToTop';
+import logoIcon from '../img/icon-192x192.png';
+
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
@@ -40,10 +42,15 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         >
           <Menu className="w-6 h-6" style={{ color: '#3958bd' }} />
         </button>
-        <Link to="/" onClick={() => setOpen(false)}>
-          <h1 className="text-2xl font-jua tracking-tight" style={{ color: '#3958bd' }}>
-            🐾 혼냥일기
+        {/* <Link to="/" onClick={() => setOpen(false)}>
+          <h1 className="text-2xl font-jua tracking-tight flex items-center gap-2">
+            <img src={logoIcon} alt="로고" className="w-6 h-6" />
+            <span className="text-[#3958bd]">혼냥일기</span>
           </h1>
+        </Link> */}
+        
+        <Link to="/" onClick={() => setOpen(false)}>
+          <img src={logoIcon} alt="혼냥일기 로고" className="w-8 h-8" />
         </Link>
 
         {open && (

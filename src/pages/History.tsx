@@ -488,7 +488,7 @@ const History = () => {
         <img src={characterImages[profileImage]} alt="고양이" className="relative z-10 w-32 mt-4" />
       </div>
 
-      <div className="bg-white text-black rounded-t-3xl px-4 py-6 !pb-[100px]">
+      <div className="bg-white text-black rounded-t-3xl px-4 py-6 !pb-[120px]">
         {/* ✅ 최근 5일치 기록 여부 스탬프 UI */}
         <div className="bg-white text-black px-4 pt-1 mb-4">
             <div className="flex justify-between w-full">
