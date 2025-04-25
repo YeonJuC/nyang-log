@@ -66,7 +66,8 @@ const History = () => {
   const [editTags, setEditTags] = useState<string[]>([]);
 
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
-  
+  const [showDetail, setShowDetail] = useState<LogEntry | null>(null);
+
   const handleEdit = (log: LogEntry) => {
     setEditTarget(log);
     setEditText(log.text);
@@ -510,7 +511,7 @@ const History = () => {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {visibleLogs.map((log, i) => (
-              <div key={i} className="bg-white rounded-xl shadow p-4 relative group">
+              <div key={i} onClick={() => setShowDetail(log)} className="bg-white rounded-xl shadow p-4 relative group transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer">
                 {log.image && (
                   <div className="aspect-square mb-2 overflow-hidden rounded-xl">
                     <img src={log.image} alt={`냥이사진 ${i}`} className="w-full h-full object-cover" />
@@ -542,6 +543,43 @@ const History = () => {
           </div>
         )}
       </div>
+      {showDetail && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-[90%] text-black relative">
+            <button
+              onClick={() => setShowDetail(null)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+
+            {showDetail.image && (
+              <img
+                src={showDetail.image}
+                alt="기록 이미지"
+                className="w-full rounded-lg mb-4"
+              />
+            )}
+
+            {Array.isArray(showDetail.tags) && (
+              <div className="flex flex-wrap gap-2 text-sm font-apple mt-2">
+                {showDetail.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-white text-[#3958bd] rounded-full border border-[#3958bd] text-xs"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            <br />
+            <h3 className="font-bold mb-2 text-black px-1">{showDetail.date}</h3>
+            <p className="mb-3 whitespace-pre-line px-1">{showDetail.text}</p>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };
