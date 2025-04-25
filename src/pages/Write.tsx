@@ -78,12 +78,18 @@ const Write = () => {
     const todayKey = new Date().toISOString().split('T')[0];
     const entryDoc = doc(db, 'logs', user.uid, 'entries', todayKey);
 
+    const createdDate = new Date();
+    const createdDateStr = createdDate.toISOString().split('T')[0];
+
+
     const newEntry = {
       text: cuteLog,
       image: imageData || characterImages[profileImage] || '',
-      tags: selectedTags,
+      tags: selectedTags.map((tag) => tag.replace(/^#/, '')), // ✅ 여기만 수정!
       createdAt: serverTimestamp(),
-    };
+      createdDate: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' })  // <-- 이거 꼭 있어야 해
+    };    
+    
 
     try {
       await setDoc(entryDoc, newEntry);
