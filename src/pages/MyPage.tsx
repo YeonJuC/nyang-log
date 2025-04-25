@@ -122,7 +122,7 @@ const MyPage = () => {
             />
             <button
               onClick={handleSave}
-              className="w-full mt-4 bg-[#3958bd] text-white py-2 rounded-full text-sm font-semibold"
+              className="w-full mt-4 bg-[#3958bd] text-white py-2 rounded-full text-sm font-semibold !mb-[50px]"
             >
               저장하기
             </button>
