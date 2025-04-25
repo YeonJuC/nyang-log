@@ -77,19 +77,19 @@ const MyPage = () => {
       </div>
 
       {editMode && (
-        <div className="grid grid-cols-3 gap-4 justify-center mb-8 px-6 ml-8">
-          {Object.entries(characterImages).map(([key, src]) => (
-            <img
-              key={key}
-              src={src}
-              alt={key}
-              onClick={() => setSelectedImg(key)}
-              className={`w-16 h-16 rounded-full cursor-pointer border-4 ${
-                selectedImg === key ? 'border-[#3958bd]' : 'border-transparent'
-              }`}
-            />
-          ))}
-        </div>
+        <div className="grid grid-cols-3 gap-4 place-items-center mb-8 px-6 sm:px-8 md:px-12">
+        {Object.entries(characterImages).map(([key, src]) => (
+          <img
+            key={key}
+            src={src}
+            alt={key}
+            onClick={() => setSelectedImg(key)}
+            className={`w-20 h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 rounded-full cursor-pointer border-4 transition-all duration-200 ${
+              selectedImg === key ? 'border-[#3958bd]' : 'border-transparent'
+            }`}
+          />
+        ))}
+      </div>            
       )}
       <div className="w-full h-[5px] bg-gray-100" />
       <div className="bg-white rounded-xl p-5 w-full max-w-md mx-auto mb-[30px]">
