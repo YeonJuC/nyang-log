@@ -526,12 +526,12 @@ const History = () => {
                 <p className="text-xs text-gray-500">{log.date}</p>
 
                 {/* 수정 / 삭제 버튼 */}
-                <div className="absolute bottom-4 right-5 flex gap-4 opacity-60 group-hover:opacity-100 transition">
+                <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-5 flex gap-3 sm:gap-4 opacity-60 group-hover:opacity-100 transition">
                   <button onClick={(e) => handleEdit(log, e)}>
-                    <Pencil className="w-5 h-5 text-gray-500 hover:text-[#3958bd]" />
+                    <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 hover:text-[#3958bd]" />
                   </button>
                   <button onClick={(e) => handleDelete(log, e)}>
-                    <Trash2 className="w-5 h-5 text-gray-500 hover:text-red-500" />
+                    <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 hover:text-red-500" />
                   </button>
                 </div>
               </div>

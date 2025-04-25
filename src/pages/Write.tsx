@@ -219,14 +219,14 @@ const Write = () => {
       <div className="max-w-md w-full mb-10 mx-auto px-4">
         <h4 className="text-sm font-apple_bold text-gray-600 mb-3">감정 해시태그 선택</h4>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-2 gap-y-3 justify-items-center">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-3 justify-items-center px-4 sm:px-6 md:px-8">
           {defaultTags.map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`px-4 py-1.5 rounded-full text-[14px] font-apple border transition whitespace-nowrap
+              className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-apple border transition-all duration-150 whitespace-nowrap
                 ${selectedTags.includes(tag)
-                  ? 'bg-[#3958bd] text-white'
+                  ? 'bg-[#3958bd] text-white border-[#3958bd]'
                   : 'bg-white text-gray-600 border-gray-300'}
               `}
             >
