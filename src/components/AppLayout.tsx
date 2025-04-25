@@ -10,6 +10,7 @@ import historyDefault from '../img/히스토리.png';
 import historyActive from '../img/히스토리_변경.png';
 import mypageDefault from '../img/마이페이지.png';
 import mypageActive from '../img/마이페이지_변경.png';
+import ScrollToTop from './ScrollToTop';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
@@ -17,13 +18,21 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="w-screen min-h-screen">
+      {/* 상단 상태바 흰 배경 추가 */}
+      <div
+        className="fixed top-0 left-0 w-full z-50"
+        style={{
+          backgroundColor: 'white', // 흰색 배경
+          height: 'env(safe-area-inset-top, 24px)', // 상태바의 높이 조정 (안전 영역 포함)
+        }}
+      />
+      <ScrollToTop />
       <div className="fixed top-0 left-0 w-full bg-white z-50" style={{ height: 'env(safe-area-inset-top, 24px)' }} />
       {/* ✅ 상태바 흰 배경 */}
       <div
         className="fixed top-0 left-0 w-full bg-white z-50"
         style={{ height: 'env(safe-area-inset-top, 24px)' }}
       />
-
       <header className="w-full bg-white shadow h-16 flex items-center justify-center relative z-30 px-4 pt-[env(safe-area-inset-top, 24px)]">
         <button
           onClick={() => setOpen(!open)}

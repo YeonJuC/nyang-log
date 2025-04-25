@@ -97,7 +97,7 @@ const Write = () => {
       await setDoc(entryDoc, newEntry);
       alert("기록 완료!");
       // Navigate to homepage after saving
-      navigate('/home');
+      navigate('/history');
     } catch (e) {
       console.error(e);
       alert("저장 실패");

@@ -86,7 +86,7 @@ const MyPage = () => {
         </div>
       )}
       <div className="w-full h-[5px] bg-gray-100" />
-      <div className="bg-white rounded-xl p-4 w-full max-w-md mx-auto shadow-sm mb-[80px]">
+      <div className="bg-white rounded-xl p-4 w-full max-w-md mx-auto shadow-sm mb-[30px]">
         <h2 className="text-lg text-black font-apple_bold mb-[30px] mt-8">기본정보</h2>
 
         {editMode ? (
