@@ -53,7 +53,6 @@ const MyPage = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
   
       setEditMode(false);
-      alert('프로필이 저장되었습니다!');
     } catch (e) {
       console.error('저장 오류:', e);
     }
@@ -63,9 +62,9 @@ const MyPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <h2 className="text-xl font-apple_bigbold text-center mb-8 mt-6 text-black">프로필 설정</h2>
+      <h2 className="text-xl font-apple_bigbold text-center mb-8 mt-8 text-black">프로필 설정</h2>
 
-      <div className="flex flex-col items-center mb-4">
+      <div className="flex flex-col items-center mb-12">
         <img
           src={selectedImgSrc}
           alt="프로필"
@@ -93,28 +92,28 @@ const MyPage = () => {
         </div>
       )}
       <div className="w-full h-[5px] bg-gray-100" />
-      <div className="bg-white rounded-xl p-4 w-full max-w-md mx-auto shadow-sm mb-[30px]">
-        <h2 className="text-lg text-black font-apple_bold mb-[30px] mt-8">기본정보</h2>
+      <div className="bg-white rounded-xl p-5 w-full max-w-md mx-auto mb-[30px]">
+        <h2 className="text-lg text-black font-apple_bold mb-[40px] mt-6">기본정보</h2>
 
         {editMode ? (
           <div className="space-y-3">
             <span className="text-gray-400 text-sm">보호자 이름</span>
             <input
-              className="w-full border px-4 py-2 !mb-[10px] rounded text-sm"
+              className="w-full border px-4 py-2 !mb-[15px] rounded text-sm"
               value={catName}
               onChange={(e) => setCatName(e.target.value)}
               placeholder="보호자 이름"
             />
             <span className="text-gray-400 text-sm">반려묘 이름</span>
             <input
-              className="w-full border px-4 py-2 !mb-[10px] rounded text-sm"
+              className="w-full border px-4 py-2 !mb-[15px] rounded text-sm"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder="반려묘 이름"
             />
             <span className="text-gray-400 text-sm">반려묘 나이</span>
             <input
-              className="w-full border px-4 py-2 !mb-[10px] rounded text-sm"
+              className="w-full border px-4 py-2 !mb-[15px] rounded text-sm"
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="반려묘 나이"
@@ -122,7 +121,7 @@ const MyPage = () => {
             />
             <span className="text-gray-400 text-sm">반려묘 종</span>
             <input
-              className="w-full border px-4 py-2 !mb-[10px] rounded text-sm"
+              className="w-full border px-4 py-2 !mb-[15px] rounded text-sm"
               value={species}
               onChange={(e) => setSpecies(e.target.value)}
               placeholder="반려묘 종"
@@ -135,7 +134,7 @@ const MyPage = () => {
             </button>
           </div>
         ) : (
-          <div className="text-sm text-gray-700 space-y-6">
+          <div className="text-sm text-gray-700 space-y-8">
             <div className="flex justify-between">
               <span className="text-gray-400">보호자 이름</span>
               <span className="font-semibold">{catName}</span>

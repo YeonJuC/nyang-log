@@ -259,34 +259,28 @@ const History = () => {
       const logRef = doc(db, 'logs', user.uid, 'entries', editTarget.docId);
       await updateDoc(logRef, {
         text: editText,
-        tags: editTags.map((tag) => tag.replace(/^#/, '')), // ✅ 여기 반드시 이렇게!
+        tags: editTags.map((tag) => tag.replace(/^#/, '')),
       });
   
       setLogs((prev) =>
         prev.map((log) =>
           log.docId === editTarget.docId
-            ? {
-                ...log,
-                text: editText,
-                tags: editTags.map((tag) => tag.replace(/^#/, '')), // ✅ 로컬 상태에도 동일하게 반영
-              }
+            ? { ...log, text: editText, tags: editTags }
             : log
-        )
+        )        
       );
   
-      alert('수정 완료!');
+      // ✅ 팝업 상태 전부 닫기
       setEditMode(false);
       setEditTarget(null);
       setEditText('');
       setEditTags([]);
+      setShowDetail(null); // ✅ 상세 모달도 닫기
     } catch (err) {
       console.error('수정 실패:', err);
       alert('수정 중 오류가 발생했어요');
     }
   };
-  
-  
-  
   
   return (
     <div className="min-h-screen bg-[#5976D7] text-white">
@@ -423,20 +417,19 @@ const History = () => {
                 const logRef = doc(db, 'logs', user.uid, 'entries', deleteTarget.docId);
                 try {
                   await deleteDoc(logRef);
+                
+                  // 삭제된 로그를 상태에서 제거
                   setLogs((prev) =>
-                    prev.map((log) =>
-                      log.docId === editTarget.docId
-                        ? { ...log, text: editText, tags: editTags }  // 기존 태그 무시하고 완전 덮어씀
-                        : log
-                    )
-                  );                  
-                  alert('삭제 완료!');
+                    prev.filter((log) => log.docId !== deleteTarget.docId)
+                  );
+              
                 } catch (e) {
                   console.error('삭제 실패:', e);
                   alert('삭제 중 오류 발생');
                 } finally {
-                  setDeleteTarget(null);
-                }
+                  setDeleteTarget(null);    // 삭제 팝업 닫기
+                  setShowDetail(null);      // ✅ 상세 모달도 닫기
+                }                
               }}>
                 삭제하기
               </button>
@@ -491,7 +484,7 @@ const History = () => {
         <img src={characterImages[profileImage]} alt="고양이" className="relative z-10 w-32 mt-4" />
       </div>
 
-      <div className="bg-white text-black rounded-t-3xl px-4 py-6 !pb-[120px]">
+      <div className="bg-white text-black rounded-t-3xl px-4 py-6 !pb-[120px] min-h-[calc(100vh-200px)]">
         {/* ✅ 최근 5일치 기록 여부 스탬프 UI */}
         <div className="bg-white text-black px-4 pt-1 mb-4">
             <div className="flex justify-between w-full">
