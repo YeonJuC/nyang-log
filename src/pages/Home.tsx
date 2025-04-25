@@ -27,6 +27,10 @@ const Home = () => {
   const [profileImage, setProfileImage] = useState<string>('ch_1');
   const [todayLog, setTodayLog] = useState<any>(null);
   const [allLogs, setAllLogs] = useState<any[]>([]);
+  {/* const [catType, setCatType] = useState(''); // 초기엔 빈 값
+  // 예: 서버에서 받은 분석 결과
+  const catTypeFromServer = '느긋한 집냥이'; // or '활발한 활동 고양이' 등*/}
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,6 +73,20 @@ const Home = () => {
         console.error('Firestore 기록 불러오기 실패:', e);
       }
     };
+    {/*const fetchCatType = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+  
+      try {
+        const docSnap = await getDoc(doc(db, 'users', user.uid));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setCatType(data.catType || '활발한 활동 고양이'); // fallback
+        }
+      } catch (err) {
+        console.error('고양이 유형 불러오기 실패:', err);
+      }
+    }; */}
 
     fetchData();
   }, []);
@@ -114,7 +132,15 @@ const Home = () => {
                   className="w-full"
                 />
               </div>
-
+              {/*고양이 유형별
+              활발한 활동 고양이:	많이 움직이고 자주 탐색함
+              느긋한 집냥이:	주로 잠자고 편안한 공간 선호
+              호기심 많은 탐험가:	새로운 장소, 소리 탐색을 즐김
+              애교 폭발 꾹꾹이:	보호자 근처에서 애교 많음
+              외향적 파티냥이:	낯선 사람이나 동물에게도 활발함
+              독립적인 혼자냥이:	혼자 있는 걸 좋아함  */}
+              
+              {/*<p className="text-2xl text-[#3958bd] font-jua mt-1">{catType}</p>*/}
               <p className="text-2xl text-[#3958bd] font-jua mt-1">활발한 활동 고양이</p>
               <p className="text-sm font-apple mt-4">안녕하세요!</p>
               <p className="text-sm font-apple">오늘 {catName}의 하루를 보여드릴게요!</p>

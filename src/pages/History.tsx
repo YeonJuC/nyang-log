@@ -526,7 +526,7 @@ const History = () => {
                 <p className="text-xs text-gray-500">{log.date}</p>
 
                 {/* 수정 / 삭제 버튼 */}
-                <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-5 flex gap-3 sm:gap-4 opacity-60 group-hover:opacity-100 transition">
+                <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-5 flex gap-3 sm:gap-3 opacity-60 group-hover:opacity-100 transition">
                   <button onClick={(e) => handleEdit(log, e)}>
                     <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 hover:text-[#3958bd]" />
                   </button>
