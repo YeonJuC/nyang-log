@@ -13,6 +13,7 @@ import ch_4 from '../img/ch_4.png';
 import ch_5 from '../img/ch_5.png';
 import ch_6 from '../img/ch_6.png';
 import { useNavigate } from 'react-router-dom';
+import { useSelectedCat } from '../utils/SelectedCatContext'; 
 
 const characterImages: Record<string, string> = {
   ch_1,
@@ -28,41 +29,16 @@ const defaultTags = ['#행복', '#슬픔', '#분노', '#기쁨', '#불안', '#�
 const Write = () => {
   const [behavior, setBehavior] = useState('');
   const [imageData, setImageData] = useState<string | null>(null);
-  const [logs, setLogs] = useState<any[]>([]);
-  const [nickname, setNickname] = useState('');
-  const [profileImage, setProfileImage] = useState('');
+  const [logs] = useState<any[]>([]);
+  const [profileImage] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const navigate = useNavigate();
+  const { selectedCat } = useSelectedCat();
 
-  useEffect(() => {
-    const fetchNickname = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const docRef = doc(db, 'users', user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setNickname(data.nickname || '');
-      }
-    };
-
-    const fetchProfileImage = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+  if (!selectedCat) {
+    return null;
+  }
   
-      const docRef = doc(db, 'users', user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setProfileImage(data.profileImage || '');
-      }
-    };
-
-    fetchNickname();
-    fetchProfileImage();
-  },[]);
-
   const convertToCatSpeech = (text: string) => {
     const endings = ['냥~', '다냥!', '이다옹!', '했지롱~', '했다옹!', '이다냥~', '냐아~', '냐옹!'];
     const randomEnding = endings[Math.floor(Math.random() * endings.length)];
@@ -77,20 +53,24 @@ const Write = () => {
     }
 
     const cuteLog = convertToCatSpeech(behavior);
+    const today = new Date();
     const todayKey = new Date().toISOString().split('T')[0];
-    const entryDoc = doc(db, 'logs', user.uid, 'entries', todayKey);
+    // 🔥 여기 수정: 날짜 + 고양이 ID를 조합해서 문서 키 생성
+    const entryDoc = doc(db, 'logs', user.uid, 'entries', `${todayKey}_${selectedCat?.id}`);
 
     const createdDate = new Date();
     const createdDateStr = createdDate.toISOString().split('T')[0];
 
 
+    // ✅ 선택한 고양이 프로필을 기본 이미지로 사용
     const newEntry = {
       text: cuteLog,
-      image: imageData || characterImages[profileImage] || '',
-      tags: selectedTags.map((tag) => tag.replace(/^#/, '')), // ✅ 여기만 수정!
+      image: imageData || (selectedCat ? characterImages[selectedCat.profileImage as keyof typeof characterImages] : ''),
+      tags: selectedTags.map((tag) => tag.replace(/^#/, '')),
       createdAt: serverTimestamp(),
-      createdDate: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' })  // <-- 이거 꼭 있어야 해
-    };    
+      createdDate: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }),
+      catId: selectedCat?.id || null,  // ✅ 이 부분도 추가: 어떤 고양이 기록인지 표시!
+    }; 
     
 
     try {
@@ -169,7 +149,7 @@ const Write = () => {
     <div className="min-h-screen p-6 flex flex-col items-center bg-[#f9fafb]">
       <h2 className="text-xl font-apple_bigbold text-center mb-8 text-black">혼냥일기 작성</h2>
       <p className="text-left w-full max-w-md text-gray-500 font-apple text-sm px-8 mb-1">함께하는 반려묘 기록</p>
-      <p className="text-left w-full max-w-md text-black-300 font-apple_bold text-xl px-8 mb-2">오늘 {nickname}의 모습을 <br/>간단히 기록해볼까요?</p>
+      <p className="text-left w-full max-w-md text-black-300 font-apple_bold text-xl px-8 mb-2">오늘 {selectedCat.name}의 모습을 <br/>간단히 기록해볼까요?</p>
 
       <div className="py-4 px-4 mb-4 flex flex-col items-center">
         <div className="grid grid-cols-2 gap-3 w-full max-w-md">
@@ -197,11 +177,12 @@ const Write = () => {
       </div>
 
       {/* 이미지 미리보기 */}
-      {(imageData || characterImages[profileImage]) && (
+      {(imageData || characterImages[selectedCat.profileImage]) && (
         <div className="w-[260px] aspect-square mb-6 rounded-xl overflow-hidden border border-gray-200 shadow-md mx-auto">
-          <img src={imageData || characterImages[profileImage]} alt="미리보기" className="object-cover w-full h-full" />
+          <img src={imageData || characterImages[selectedCat.profileImage]} alt="미리보기" className="object-cover w-full h-full" />
         </div>
       )}
+
 
       {/* 이미지 선택 안내 */}
       <label className="text-xs text-gray-400 mb-2 font-apple block text-center">(이미지를 첨부하려면 아래 버튼을 눌러주세요.)</label>
@@ -217,14 +198,14 @@ const Write = () => {
 
       {/* 감정 해시태그 */}
       <div className="max-w-md w-full mb-10 mx-auto px-4">
-        <h4 className="text-sm font-apple_bold text-gray-600 mb-3">감정 해시태그 선택</h4>
+        <h4 className="text-base font-apple_bold text-gray-700 mb-4">감정 해시태그 선택</h4>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-3 gap-y-3 justify-items-center px-4 sm:px-6 md:px-8">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-4 gap-y-4 justify-items-center px-4 sm:px-6 md:px-8">
           {defaultTags.map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-apple border transition-all duration-150 whitespace-nowrap
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-apple border transition-all duration-150 whitespace-nowrap
                 ${selectedTags.includes(tag)
                   ? 'bg-[#3958bd] text-white border-[#3958bd]'
                   : 'bg-white text-gray-600 border-gray-300'}

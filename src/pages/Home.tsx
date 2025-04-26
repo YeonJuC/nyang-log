@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { auth, provider, db } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
-import { saveServerDiary } from '../utils/saveServerDiary';
-import drawCat from '../img/draw_cat.png';
+import { saveServerDiary } from '../server/saveServerDiary';
+import { useSelectedCat } from '../utils/SelectedCatContext'; // ✅ 추가
 
+import drawCat from '../img/draw_cat.png';
 import ch_1 from '../img/ch_1.png';
 import ch_2 from '../img/ch_2.png';
 import ch_3 from '../img/ch_3.png';
@@ -23,40 +24,30 @@ const profileImages: Record<string, string> = {
 
 const Home = () => {
   const [user, setUser] = useState<any>(null);
-  const [catName, setCatName] = useState<string>('');
-  const [profileImage, setProfileImage] = useState<string>('ch_1');
   const [todayLog, setTodayLog] = useState<any>(null);
   const [allLogs, setAllLogs] = useState<any[]>([]);
-  {/* const [catType, setCatType] = useState(''); // 초기엔 빈 값
-  // 예: 서버에서 받은 분석 결과
-  const catTypeFromServer = '느긋한 집냥이'; // or '활발한 활동 고양이' 등*/}
+  const [todayDiary, setTodayDiary] = useState<string | null>(null);
+  const { selectedCat } = useSelectedCat(); // ✅ 선택된 고양이 Context 불러오기
+  const todayLogForSelectedCat = todayLog && selectedCat && todayLog.catId === selectedCat.id ? todayLog : null;
 
+  // 모든 기록 필터링
+  const filteredLogs = selectedCat
+    ? allLogs.filter((log) => log.catId === selectedCat.id)
+    : [];
+
+  useEffect(() => {
+    const diary = localStorage.getItem('todayLog');
+    if (diary) {
+      setTodayDiary(diary);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       const currentUser = auth.currentUser;
-      if (!currentUser) return;
+      if (!currentUser || !selectedCat) return; // 선택된 고양이 없으면 무시
 
       setUser(currentUser);
-
-      try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setCatName(data.nickname || '고양이');
-          setProfileImage(data.profileImage || 'ch_1');
-        }
-      } catch (e) {
-        console.error('유저 정보 불러오기 실패:', e);
-      }
-
-      const todayRaw = localStorage.getItem('todayLog');
-      try {
-        setTodayLog(todayRaw ? JSON.parse(todayRaw) : null);
-      } catch (e) {
-        console.error('JSON 파싱 오류:', e);
-        setTodayLog(null);
-      }
 
       try {
         const q = query(
@@ -64,32 +55,21 @@ const Home = () => {
           orderBy('createdAt', 'desc')
         );
         const querySnapshot = await getDocs(q);
-        const fetchedLogs = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          date: doc.id,
-        }));
+        const fetchedLogs = querySnapshot.docs
+          .map((doc) => ({
+            ...doc.data(),
+            date: doc.id,
+          }))
+          // 여기서 선택된 고양이에 해당하는 로그만 필터링 (추후 필요하면 추가)
+          ;
         setAllLogs(fetchedLogs);
       } catch (e) {
         console.error('Firestore 기록 불러오기 실패:', e);
       }
     };
-    {/*const fetchCatType = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-  
-      try {
-        const docSnap = await getDoc(doc(db, 'users', user.uid));
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setCatType(data.catType || '활발한 활동 고양이'); // fallback
-        }
-      } catch (err) {
-        console.error('고양이 유형 불러오기 실패:', err);
-      }
-    }; */}
 
     fetchData();
-  }, []);
+  }, [selectedCat]); // ✅ 고양이 선택이 바뀔 때마다 fetch
 
   const handleLogin = async () => {
     try {
@@ -101,7 +81,8 @@ const Home = () => {
     }
   };
 
-  if (!user) return null;
+  if (!user || !selectedCat) return null; // 선택된 고양이 없으면 렌더링 안 함
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -123,15 +104,16 @@ const Home = () => {
                 <p className="font-apple text-base mb-1">같이 없는 시간까지 함께하는</p>
                 <h1 className="text-3xl">반려묘의<br />모든 것</h1>
               </div>
-              <p className="text-sm font-apple_bold text-black">{catName}님의 활동 유형은</p>
+              <p className="text-sm font-apple_bold text-black">{selectedCat.name}님의 활동 유형은</p>
 
               <div className="w-48 mx-auto my-4">
                 <img
-                  src={profileImages[profileImage]}
+                  src={profileImages[selectedCat.profileImage]}
                   alt="프로필 이미지"
                   className="w-full"
                 />
               </div>
+
               {/*고양이 유형별
               활발한 활동 고양이:	많이 움직이고 자주 탐색함
               느긋한 집냥이:	주로 잠자고 편안한 공간 선호
@@ -143,7 +125,7 @@ const Home = () => {
               {/*<p className="text-2xl text-[#3958bd] font-jua mt-1">{catType}</p>*/}
               <p className="text-2xl text-[#3958bd] font-jua mt-1">활발한 활동 고양이</p>
               <p className="text-sm font-apple mt-4">안녕하세요!</p>
-              <p className="text-sm font-apple">오늘 {catName}의 하루를 보여드릴게요!</p>
+              <p className="text-sm font-apple">오늘 {selectedCat.name}의 하루를 보여드릴게요!</p>
             </div>
           </>
         )}
@@ -179,23 +161,31 @@ const Home = () => {
               </button>
             </div>
 
+            {/* 감성 일기 표시 */}
+            {todayDiary && (
+              <div className="bg-white p-4 mt-6 rounded-xl shadow">
+                <h3 className="text-lg font-bold mb-2 text-[#3958bd]">🐾 오늘의 감성 일기</h3>
+                <p className="text-sm whitespace-pre-line font-apple">{todayDiary}</p>
+              </div>
+            )}
+
             <br />
             <h1 className="text-left text-white font-apple_bigbold px-5 mt-8">• 일일 추억 저장</h1>
             <h3 className="text-lg text-white font-apple_bigbold text-gray-800 mb-4">📍 오늘 기록</h3>
 
-            {todayLog ? (
+            {todayLogForSelectedCat ? (
               <div className="bg-white p-4 w-4/5 mx-auto rounded-2xl shadow-xl space-y-4">
-                {todayLog.image && (
+                {todayLogForSelectedCat.image && (
                   <div className="rounded-xl overflow-hidden aspect-square border border-gray-100">
                     <img
-                      src={todayLog.image}
+                      src={todayLogForSelectedCat.image}
                       alt="오늘의 고양이"
                       className="object-cover w-full h-full"
                     />
                   </div>
                 )}
                 <p className="text-gray-800 text-base leading-relaxed whitespace-pre-line font-apple_bold">
-                  {todayLog.text}
+                  {todayLogForSelectedCat.text}
                 </p>
               </div>
             ) : (
@@ -207,11 +197,11 @@ const Home = () => {
               </div>
             )}
 
-            {user && allLogs.length > 0 && (
+            {user && filteredLogs.length > 0 && (
               <div className="w-4/5 mx-auto mt-8">
                 <h3 className="text-lg text-white font-apple_bigbold text-gray-800 mb-6">📜 모든 기록</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {allLogs.map((log, idx) => (
+                  {filteredLogs.map((log, idx) => (
                     <div key={idx} className="bg-white rounded-xl shadow p-2 flex flex-col">
                       {log.image && (
                         <div className="rounded overflow-hidden aspect-square border border-gray-100 mb-2">

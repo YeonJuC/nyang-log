@@ -1,3 +1,4 @@
+import { SelectedCatProvider } from './utils/SelectedCatContext';
 import { useEffect, useState } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -14,6 +15,7 @@ import SetupProfile from './pages/SetupProfile';
 import Landing from './pages/Landing';
 import './App.css'; 
 import ScrollToTop from './components/ScrollToTop';
+import AddCat from './pages/AddCat';
 
 function AppRoutes() {
   const [user, setUser] = useState<any>(null);
@@ -56,28 +58,32 @@ function AppRoutes() {
 
   return (
     <>
-      <ScrollToTop /> {/* ✅ 바로 여기 넣기 */}
-
-      {!user ? (
-        <Routes>
-          <Route path="*" element={<Login />} />
-        </Routes>
-      ) : needsProfile ? (
-        <Routes>
-          <Route path="*" element={<SetupProfile onComplete={() => setNeedsProfile(false)} uid={user.uid} />} />
-        </Routes>
-      ) : location.pathname === '/' ? (
-        <Navigate to="/landing" replace />
-      ) : (
-        <Routes>
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
-          <Route path="/write" element={<AppLayout><Write /></AppLayout>} />
-          <Route path="/history" element={<AppLayout><History /></AppLayout>} />
-          <Route path="/mypage" element={<AppLayout><MyPage /></AppLayout>} />
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
-      )}
+    <SelectedCatProvider>
+        <ScrollToTop /> {/* ✅ 바로 여기 넣기 */}
+    
+        {!user ? (
+          <Routes>
+            <Route path="*" element={<Login />} />
+          </Routes>
+        ) : needsProfile ? (
+          <Routes>
+            <Route path="*" element={<SetupProfile onComplete={() => setNeedsProfile(false)} uid={user.uid} />} />
+          </Routes>
+        ) : location.pathname === '/' ? (
+          <Navigate to="/landing" replace />
+        ) : (
+          <Routes>
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
+            <Route path="/write" element={<AppLayout><Write /></AppLayout>} />
+            <Route path="/history" element={<AppLayout><History /></AppLayout>} />
+            <Route path="/mypage" element={<AppLayout><MyPage /></AppLayout>} />
+            <Route path="/add-cat" element={<AppLayout><AddCat /></AppLayout>} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        )}
+    </SelectedCatProvider>
+      
     </>
   );
 }

@@ -1,6 +1,7 @@
 {
   "name": "nyang-log",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "dependencies": {
     "@capacitor/cli": "^7.2.0",
@@ -13,8 +14,12 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "firebase": "^11.6.0",
     "lucide-react": "^0.488.0",
+    "openai": "^4.96.0",
     "react": "^19.1.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^19.1.0",
@@ -26,6 +31,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/istanbul-reports": "^3.0.4",
     "@types/react-router-dom": "^5.3.3",
     "@types/recharts": "^2.0.1",
