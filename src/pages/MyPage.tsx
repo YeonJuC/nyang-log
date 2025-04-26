@@ -12,6 +12,11 @@ import { Pencil } from 'lucide-react';
 
 const characterImages: Record<string, string> = { ch_1, ch_2, ch_3, ch_4, ch_5, ch_6 };
 
+interface SetupProfileProps {
+  uid: string;
+  onComplete: () => void;
+}
+
 const MyPage = () => {
   const { selectedCat } = useSelectedCat(); // ✅
   const [nickname, setNickname] = useState('');
@@ -19,6 +24,33 @@ const MyPage = () => {
   const [species, setSpecies] = useState('');
   const [selectedImg, setSelectedImg] = useState('ch_1');
   const [editMode, setEditMode] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState('ch_1');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    const user = auth.currentUser; // ✅ 현재 로그인한 유저 가져오기
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+  
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        nickname,
+        age,
+        species,
+        profileImage: selectedCharacter,
+        createdAt: new Date(),
+      });
+  
+      // 저장 완료 후
+      setEditMode(false);
+    } catch (error) {
+      console.error('프로필 저장 오류:', error);
+    }
+  };
+  
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -37,7 +69,7 @@ const MyPage = () => {
     };
     fetchProfile();
   }, [selectedCat]);
-
+  
   const handleSave = async () => {
     const user = auth.currentUser;
     if (!user || !selectedCat) return alert('로그인이 필요합니다.');
@@ -156,3 +188,7 @@ const MyPage = () => {
 };
 
 export default MyPage;
+function onComplete() {
+  throw new Error('Function not implemented.');
+}
+
