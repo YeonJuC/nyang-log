@@ -22,7 +22,7 @@ interface SetupProfileProps {
   onComplete: () => void;
 }
 
-const SetupProfile = ({uid, onComplete }: SetupProfileProps) => {
+const SetupProfile = ({ uid, onComplete }: SetupProfileProps) => {
   const [nickname, setNickname] = useState('');
   const [age, setAge] = useState('');
   const [species, setSpecies] = useState('');
@@ -39,32 +39,41 @@ const SetupProfile = ({uid, onComplete }: SetupProfileProps) => {
         profileImage: selectedCharacter,
         createdAt: new Date(),
       });
-      onComplete(); 
+      onComplete();
     } catch (error) {
       console.error('프로필 저장 오류:', error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex flex-col items-center pt-12 px-6">
       <h1 className="text-2xl font-apple_bigbold mb-6 text-[#3958bd]">프로필 설정</h1>
+
+      {/* ✅ 선택한 캐릭터 크게 보여주기 */}
+      <div className="mb-6">
+        <img
+          src={characterImages[selectedCharacter]}
+          alt="선택된 캐릭터"
+          className="w-32 h-32"
+        />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-xs">
         <div className="font-apple_bold text-gray-700">캐릭터 선택</div>
-        <div className="flex space-x-2 overflow-x-auto mb-4">
+        <div className="flex space-x-4 overflow-x-auto mb-6">
           {Object.keys(characterImages).map((charKey) => (
             <button
               key={charKey}
               type="button"
               onClick={() => setSelectedCharacter(charKey)}
-              className={`p-1 rounded-full border-2 ${
-                selectedCharacter === charKey ? 'border-[#3958bd]' : 'border-transparent'
+              className={`w-16 h-16 flex items-center justify-center rounded-full border-4 ${
+                selectedCharacter === charKey ? 'border-[#3958bd]' : 'border-gray-300'
               }`}
             >
               <img
                 src={characterImages[charKey]}
                 alt={charKey}
-                className="w-14 h-14 object-cover rounded-full"
+                className="w-full h-full object-cover rounded-full"
               />
             </button>
           ))}
@@ -108,7 +117,7 @@ const SetupProfile = ({uid, onComplete }: SetupProfileProps) => {
 
         <button
           type="submit"
-          className="w-full bg-[#3958bd] text-white py-2 rounded font-semibold mt-6"
+          className="w-full bg-[#3958bd] text-white py-3.5 rounded-full font-semibold text-base mt-6"
         >
           시작하기
         </button>
