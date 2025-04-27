@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { db, auth } from '../firebase';
-import { useNavigate } from 'react-router-dom'; // ✅ 추가
-import { collection, addDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
+import { useSelectedCat } from '../utils/SelectedCatContext';
 
 import ch_1 from '../img/ch_1.png';
 import ch_2 from '../img/ch_2.png';
@@ -19,8 +20,19 @@ const characterImages: Record<string, string> = {
   ch_6,
 };
 
+interface CatInfo {
+  id: string;
+  nickname: string;
+  age: string;
+  species: string;
+  profileImage: string;
+  createdAt: Date;
+}
+
 const AddCat = () => {
-  const navigate = useNavigate(); // ✅ 추가
+  const navigate = useNavigate();
+  const { setSelectedCat, setCats } = useSelectedCat();
+
   const [nickname, setNickname] = useState('');
   const [age, setAge] = useState('');
   const [species, setSpecies] = useState('');
@@ -30,7 +42,7 @@ const AddCat = () => {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user) return;
-  
+
     try {
       const catRef = await addDoc(collection(db, 'users', user.uid, 'cats'), {
         nickname,
@@ -39,32 +51,45 @@ const AddCat = () => {
         profileImage: selectedCharacter,
         createdAt: new Date(),
       });
-  
-      const newCatId = catRef.id; // 추가된 고양이 ID 얻기
-  
-      // ✅ 고양이 추가하고 바로 리스트 새로 불러오기 + 새로 추가된 고양이 선택
-      await refreshProfileAndCats(newCatId);
-  
+
+      await refreshProfileAndCats(catRef.id);
+
       alert('고양이 추가 완료!');
-      navigate('/home'); // ✅ 추가 후 홈으로 이동
-  
+      navigate('/home');
+
     } catch (error) {
       console.error('고양이 추가 오류:', error);
     }
   };
-  
 
-  function handleCancel(event: React.MouseEvent<HTMLButtonElement>): void {
+  const handleCancel = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    // 취소 버튼 누르면 홈으로 이동하는 로직 추가
-  }
+    navigate('/home');
+  };
+
+  const refreshProfileAndCats = async (newCatId: string) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const catsQuery = query(collection(db, 'users', user.uid, 'cats'), orderBy('createdAt'));
+    const catsSnapshot = await getDocs(catsQuery);
+    const catsList: CatInfo[] = catsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...(doc.data() as Omit<CatInfo, 'id'>)
+    }));
+
+    setCats(catsList);
+
+    const newlyAddedCat = catsList.find(cat => cat.id === newCatId);
+    if (newlyAddedCat) {
+      setSelectedCat(newlyAddedCat);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center pt-12 px-6">
-      {/* ✅ pt-12로 상단 패딩만 주고, 중앙이 아니라 상단에 배치 */}
       <h1 className="text-2xl font-apple_bigbold mb-6 text-[#3958bd]">반려묘 추가하기</h1>
 
-      {/* ✅ 선택한 캐릭터 크게 보여주기 */}
       <div className="mb-6">
         <img
           src={characterImages[selectedCharacter]}
@@ -94,63 +119,16 @@ const AddCat = () => {
         </div>
 
         <div className="space-y-3">
-          <div>
-            <label className="text-gray-400 text-sm block mb-1">반려묘 이름</label>
-            <input
-              placeholder="반려묘 이름"
-              className="w-full border p-2 rounded text-sm"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-400 text-sm block mb-1">반려묘 나이</label>
-            <input
-              type="number"
-              placeholder="반려묘 나이"
-              className="w-full border p-2 rounded text-sm"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-400 text-sm block mb-1">반려묘 종</label>
-            <input
-              placeholder="반려묘 종"
-              className="w-full border p-2 rounded text-sm"
-              value={species}
-              onChange={(e) => setSpecies(e.target.value)}
-              required
-            />
-          </div>
+          <input placeholder="반려묘 이름" className="w-full border p-2 rounded" value={nickname} onChange={(e) => setNickname(e.target.value)} required />
+          <input type="number" placeholder="반려묘 나이" className="w-full border p-2 rounded" value={age} onChange={(e) => setAge(e.target.value)} required />
+          <input placeholder="반려묘 종" className="w-full border p-2 rounded" value={species} onChange={(e) => setSpecies(e.target.value)} required />
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-[#3958bd] text-white py-3.5 rounded-full font-semibold text-base mt-6"
-        >
-          추가하기
-        </button>
-
-        {/* ✅ 취소 버튼 추가 */}
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="w-full bg-gray-300 text-gray-700 py-3.5 rounded-full font-semibold text-base"
-        >
-          취소
-        </button>
+        <button type="submit" className="w-full bg-[#3958bd] text-white py-3.5 rounded-full font-semibold">추가하기</button>
+        <button type="button" onClick={handleCancel} className="w-full bg-gray-300 text-gray-700 py-3.5 rounded-full font-semibold">취소</button>
       </form>
     </div>
   );
 };
 
 export default AddCat;
-function refreshProfileAndCats(newCatId: string) {
-  throw new Error('Function not implemented.');
-}
-
