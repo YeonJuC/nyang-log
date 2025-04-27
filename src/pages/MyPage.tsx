@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useSelectedCat } from '../utils/SelectedCatContext';
 import ch_1 from '../img/ch_1.png';
 import ch_2 from '../img/ch_2.png';
@@ -11,6 +11,7 @@ import ch_4 from '../img/ch_4.png';
 import ch_5 from '../img/ch_5.png';
 import ch_6 from '../img/ch_6.png';
 import { Pencil } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const characterImages: Record<string, string> = { ch_1, ch_2, ch_3, ch_4, ch_5, ch_6 };
 
@@ -21,6 +22,7 @@ const MyPage = () => {
   const [species, setSpecies] = useState('');
   const [profileImage, setProfileImage] = useState('ch_1');
   const [editMode, setEditMode] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (selectedCat) {
@@ -60,7 +62,36 @@ const MyPage = () => {
       alert('수정 중 오류가 발생했습니다.');
     }
   };  
+  // 삭제 함수 추가
+  const handleDelete = async () => {
+    const user = auth.currentUser;
+    if (!user || !selectedCat) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
   
+    if (selectedCat.id === 'profile') {
+      alert('기본 프로필은 삭제할 수 없습니다.');
+      return;
+    }
+  
+    const confirmDelete = window.confirm('정말 삭제하시겠습니까? 삭제하면 복구할 수 없습니다.');
+    if (!confirmDelete) return;
+  
+    try {
+      const catRef = doc(db, 'users', user.uid, 'cats', selectedCat.id);
+      await deleteDoc(catRef);
+  
+      alert('삭제 완료!');
+      setEditMode(false);
+  
+      await refreshProfileAndCats();
+      navigate('/home'); // 삭제 후 홈 이동
+    } catch (e) {
+      console.error('삭제 실패:', e);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };    
 
   return (
     <div className="min-h-screen bg-white">
@@ -149,6 +180,14 @@ const MyPage = () => {
               className="w-full mt-8 h-[50px] bg-[#3958bd] text-white py-2 rounded-full text-sm font-semibold"
             >
               수정하기
+            </button>
+
+            {/* 삭제 버튼 추가 */}
+            <button
+              onClick={handleDelete}
+              className="w-full mt-4 h-[50px] bg-red-500 text-white py-2 rounded-full text-sm font-semibold"
+            >
+              삭제하기
             </button>
           </div>
         )}
