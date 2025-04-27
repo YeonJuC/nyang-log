@@ -59,7 +59,7 @@ function AppRoutes() {
   return (
     <>
     <SelectedCatProvider>
-        <ScrollToTop /> {/* ✅ 바로 여기 넣기 */}
+        <ScrollToTop />
     
         {!user ? (
           <Routes>
@@ -67,7 +67,7 @@ function AppRoutes() {
           </Routes>
         ) : needsProfile ? (
           <Routes>
-            <Route path="*" element={<SetupProfile onComplete={() => setNeedsProfile(false)} uid={user.uid} />} />
+            <Route path="*" element={<SetupProfile uid={user.uid} onComplete={() => setNeedsProfile(false)} />} />
           </Routes>
         ) : location.pathname === '/' ? (
           <Navigate to="/landing" replace />
