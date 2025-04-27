@@ -271,8 +271,8 @@ const History = () => {
 
       {/* 수정 모달 */}
       {editMode && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm text-black">
             <textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
@@ -300,7 +300,7 @@ const History = () => {
 
       {/* 삭제 모달 */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm text-black">
             <p className="mb-4">정말 삭제할까요?</p>
             <div className="flex justify-end gap-2">
