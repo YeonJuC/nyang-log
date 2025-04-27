@@ -18,6 +18,117 @@ const characterImages = { ch_1, ch_2, ch_3, ch_4, ch_5, ch_6 };
 const defaultTags = ['행복', '슬픔', '분노', '기쁨', '불안', '놀람', '사랑', '지루함', '궁금', '심심'];
 const gradientColors = ['#4A6CF7', '#597DF8', '#7B98FB', '#A7BCFF', '#C9D6FF'];
 
+const emotionMessages: Record<string, string[]> = {
+  행복: [
+    "오늘은 기분 좋은 일이 가득했어요!",
+    "행복 가득한 하루였군요!",
+    "웃음이 멈추지 않는 날이었어요!",
+    "좋은 에너지가 넘쳤어요!",
+    "세상이 다 예뻐 보였어요!",
+    "웃을 일이 많았던 하루네요!",
+    "마음이 포근했어요!",
+    "사소한 것도 행복했어요!",
+    "기분이 아주 맑았어요!",
+    "오늘은 정말 최고였어요!",
+  ],
+  슬픔: [
+    "조금 울적한 하루였네요.",
+    "마음이 무거웠던 하루였어요.",
+    "조용히 위로가 필요한 날이에요.",
+    "마음이 가라앉는 하루였어요.",
+    "조금 눈물이 났던 날이에요.",
+    "괜찮아요, 내일은 더 나아질 거예요.",
+    "마음이 서글펐어요.",
+    "조금은 힘들었던 하루였어요.",
+    "위로가 필요한 순간이었어요.",
+    "혼자 있고 싶었던 날이에요.",
+  ],
+  분노: [
+    "조금 화가 나는 일이 있었군요!",
+    "참기 힘든 순간이 있었어요!",
+    "마음이 들끓었던 하루였어요.",
+    "짜증이 났던 하루였네요.",
+    "억울한 마음이 들었어요.",
+    "화를 삭이느라 애썼어요.",
+    "속상함을 느꼈던 하루에요.",
+    "불편한 마음이 들었어요.",
+    "꾹 참은 순간들이 있었어요.",
+    "마음이 거칠었던 하루였어요.",
+  ],
+  기쁨: [
+    "마음이 들떴던 하루였어요!",
+    "기쁜 소식이 있었나요?",
+    "웃음이 절로 났던 하루!",
+    "마음이 한없이 가벼웠어요!",
+    "좋은 기운이 넘쳤어요!",
+    "행복한 일이 많았네요!",
+    "신나는 일이 있었어요!",
+    "기분 좋은 하루였어요!",
+    "밝은 에너지가 가득했어요!",
+    "즐거운 하루를 보냈어요!",
+  ],
+  불안: [
+    "조금 긴장되는 하루였어요.",
+    "마음이 조마조마했어요.",
+    "불안감이 느껴졌던 하루였어요.",
+    "조심스러운 하루였어요.",
+    "마음이 불편했던 날이네요.",
+    "걱정이 많았던 하루에요.",
+    "초조한 기분이 들었어요.",
+    "안절부절 못했던 순간이 있었어요.",
+    "마음 한구석이 무거웠어요.",
+    "조금은 불안정했던 하루였어요.",
+  ],
+  놀람: [
+    "깜짝 놀랄 일이 있었나요?",
+    "예상치 못한 순간이 있었어요!",
+    "놀라운 하루였네요!",
+    "뜻밖의 일이 있었어요!",
+    "당황스러운 순간이 있었군요!",
+    "놀라고 웃었던 하루였어요!",
+    "놀라운 소식을 들었어요!",
+    "서프라이즈 가득했던 하루!",
+    "심장이 쿵쾅거렸던 순간!",
+    "예측할 수 없는 하루였어요!",
+  ],
+  사랑: [
+    "따뜻한 마음을 느낀 하루였어요.",
+    "사랑이 넘치는 하루였어요!",
+    "소중한 사람을 생각했어요.",
+    "마음이 몽글몽글했어요.",
+    "애정이 가득했던 하루였어요!",
+    "따뜻한 감정이 샘솟았어요.",
+    "사랑스러운 하루였어요.",
+    "마음을 나눈 순간이 있었어요.",
+    "설레는 마음이 있었어요!",
+    "감사한 마음이 들었던 하루에요.",
+  ],
+  지루함: [
+    "조금 심심했던 하루였어요.",
+    "시간이 느리게 갔던 하루네요.",
+    "무료한 하루였어요.",
+    "특별한 일 없이 지나갔어요.",
+    "지루해서 하품했던 하루!",
+    "무기력했던 하루였어요.",
+    "할 일이 없어 답답했어요.",
+    "심심해서 멍때린 시간도 있었어요.",
+    "조용히 지나간 하루였어요.",
+    "나른했던 하루였어요.",
+  ],
+  궁금: [
+    "새로운 것을 궁금해했던 하루!",
+    "알고 싶은 게 많았던 하루에요!",
+    "호기심이 가득한 하루였어요!",
+    "마음이 궁금증으로 가득했어요.",
+    "배우고 싶은 게 많았어요!",
+    "질문이 많았던 하루!",
+    "탐구심 넘치는 하루였어요!",
+    "신기한 걸 많이 본 하루!",
+    "알고 싶어 손이 근질거렸어요!",
+    "머릿속에 물음표가 가득했어요!",
+  ],
+};
+
 const History = () => {
   const { selectedCat } = useSelectedCat();
   const [logs, setLogs] = useState<any[]>([]);
@@ -25,13 +136,31 @@ const History = () => {
   const [showModal, setShowModal] = useState<'calendar' | 'chart' | null>(null);
   const [emotionMap, setEmotionMap] = useState<Record<string, string>>({});
   const [activeDates, setActiveDates] = useState<string[]>([]);
-  const [todayEmotionMessage, setTodayEmotionMessage] = useState('오늘 하루도 고생했어요!');
 
   const [editMode, setEditMode] = useState(false);
   const [editTarget, setEditTarget] = useState<any>(null);
   const [editText, setEditText] = useState('');
   const [editTags, setEditTags] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
+  const [todayEmotionMessage, setTodayEmotionMessage] = useState('오늘 하루도 고생했어요');
+
+  useEffect(() => {
+    if (logs.length > 0) {
+      const recentTags = logs
+        .filter(log => log.tags?.length > 0)
+        .slice(0, 5)
+        .flatMap(log => log.tags);
+  
+      const lastTag = recentTags.find(tag => emotionMessages[tag]);
+      if (lastTag) {
+        const messages = emotionMessages[lastTag];
+        const randomIndex = Math.floor(Math.random() * messages.length);
+        setTodayEmotionMessage(messages[randomIndex]);
+      } else {
+        setTodayEmotionMessage('오늘 하루도 고생했어요!');
+      }
+    }
+  }, [logs]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -315,3 +444,7 @@ const History = () => {
 };
 
 export default History;
+function setTodayEmotionMessage(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+
