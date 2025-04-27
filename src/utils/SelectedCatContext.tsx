@@ -3,7 +3,7 @@ import { auth, db } from '../firebase';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 
 // ✅ CatInfo 타입
-interface CatInfo {
+export interface CatInfo {
   id: string;
   nickname: string;
   age?: string;
