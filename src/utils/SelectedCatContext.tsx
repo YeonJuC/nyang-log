@@ -75,7 +75,8 @@ export const SelectedCatProvider = ({ children }: { children: ReactNode }) => {
 
     setCats(catList);
 
-    const targetId = keepSelectedId || (catList.length > 0 ? catList[0].id : 'profile');
+    // 🔥 고정: 앱 처음에는 무조건 'profile'을 선택
+    const targetId = keepSelectedId || 'profile';
 
     if (targetId === 'profile') {
       setSelectedCat({
