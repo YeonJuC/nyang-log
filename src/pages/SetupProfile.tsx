@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import ch_1 from '../img/ch_1.png';
 import ch_2 from '../img/ch_2.png';
 import ch_3 from '../img/ch_3.png';
@@ -22,7 +22,7 @@ interface SetupProfileProps {
   onComplete: () => void;
 }
 
-const SetupProfile = ({ uid, onComplete }: SetupProfileProps) => {
+const SetupProfile = ({uid, onComplete }: SetupProfileProps) => {
   const [nickname, setNickname] = useState('');
   const [age, setAge] = useState('');
   const [species, setSpecies] = useState('');
@@ -39,8 +39,7 @@ const SetupProfile = ({ uid, onComplete }: SetupProfileProps) => {
         profileImage: selectedCharacter,
         createdAt: new Date(),
       });
-
-      onComplete(); // 시작 완료 콜백
+      onComplete(); 
     } catch (error) {
       console.error('프로필 저장 오류:', error);
     }

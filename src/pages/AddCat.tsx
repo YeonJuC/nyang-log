@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { db, auth } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
 
 import ch_1 from '../img/ch_1.png';
 import ch_2 from '../img/ch_2.png';
@@ -21,34 +20,27 @@ const profileImages: Record<string, string> = {
   
 
 const AddCat = () => {
-  const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [age, setAge] = useState('');
   const [species, setSpecies] = useState('');
-  const [selectedImage, setSelectedImage] = useState('ch_1');
-  const navigate = useNavigate();
+  const [selectedCharacter, setSelectedCharacter] = useState('ch_1'); // ✅
 
-  const handleAddCat = async () => {
-    if (!auth.currentUser) return;
-
-    if (!name || !age || !species || !selectedImage) {
-      alert('모든 필드를 입력해주세요.');
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
 
     try {
-      const catsCollection = collection(db, 'users', auth.currentUser.uid, 'cats');
-      await addDoc(catsCollection, {
-        name,
+      await addDoc(collection(db, 'users', user.uid, 'cats'), {
+        nickname,
         age,
         species,
-        profileImage: selectedImage, // ch_1 ~ ch_6 문자열 저장
+        profileImage: selectedCharacter,
+        createdAt: new Date(),
       });
-
-      alert('고양이 등록 완료!');
-      navigate('/home'); // 등록 후 홈으로 이동
+      alert('고양이 추가 완료!');
     } catch (error) {
-      console.error('고양이 등록 오류:', error);
-      alert('고양이 등록에 실패했습니다.');
+      console.error('고양이 추가 오류:', error);
     }
   };
 
@@ -57,8 +49,8 @@ const AddCat = () => {
       <h2 className="text-2xl font-bold text-center mb-4">고양이 프로필 추가</h2>
       <input
         placeholder="이름"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={nickname}   // ✅ 여기
+        onChange={(e) => setNickname(e.target.value)}
         className="border p-2 rounded"
       />
       <input
@@ -78,19 +70,19 @@ const AddCat = () => {
       <div className="flex space-x-4 overflow-x-auto">
         {Object.keys(profileImages).map((key) => (
           <img
-            key={key}
-            src={profileImages[key]}
-            alt={key}
-            className={`w-16 h-16 rounded-full cursor-pointer ${
-              selectedImage === key ? 'ring-4 ring-blue-400' : ''
-            }`}
-            onClick={() => setSelectedImage(key)}
-          />
+          key={key}
+          src={profileImages[key]}
+          alt={key}
+          className={`w-16 h-16 rounded-full cursor-pointer ${
+            selectedCharacter === key ? 'ring-4 ring-blue-400' : ''
+          }`}
+          onClick={() => setSelectedCharacter(key)}
+        />        
         ))}
       </div>
 
       <button
-        onClick={handleAddCat}
+        onClick={handleSubmit}   // ✅ 여기
         className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mt-6"
       >
         고양이 추가하기

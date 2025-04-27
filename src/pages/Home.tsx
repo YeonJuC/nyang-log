@@ -104,7 +104,7 @@ const Home = () => {
                 <p className="font-apple text-base mb-1">같이 없는 시간까지 함께하는</p>
                 <h1 className="text-3xl">반려묘의<br />모든 것</h1>
               </div>
-              <p className="text-sm font-apple_bold text-black">{selectedCat.name}님의 활동 유형은</p>
+              <p className="text-sm font-apple_bold text-black">{selectedCat?.nickname ?? ''}님의 활동 유형은</p>
 
               <div className="w-48 mx-auto my-4">
                 <img
@@ -125,7 +125,7 @@ const Home = () => {
               {/*<p className="text-2xl text-[#3958bd] font-jua mt-1">{catType}</p>*/}
               <p className="text-2xl text-[#3958bd] font-jua mt-1">활발한 활동 고양이</p>
               <p className="text-sm font-apple mt-4">안녕하세요!</p>
-              <p className="text-sm font-apple">오늘 {selectedCat.name}의 하루를 보여드릴게요!</p>
+              <p className="text-sm font-apple">오늘 {selectedCat?.nickname ?? ''}의 하루를 보여드릴게요!</p>
             </div>
           </>
         )}
