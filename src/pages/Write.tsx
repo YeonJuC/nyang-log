@@ -200,12 +200,12 @@ const Write = () => {
       <div className="max-w-md w-full mb-10 mx-auto px-4">
         <h4 className="text-base font-apple_bold text-gray-700 mb-4">감정 해시태그 선택</h4>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-x-4 gap-y-4 justify-items-center px-4 sm:px-6 md:px-8">
+        <div className="flex flex-wrap gap-3 justify-center">
           {defaultTags.map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-apple border transition-all duration-150 whitespace-nowrap
+              className={`px-4 py-2 rounded-full text-sm font-apple border transition-all duration-150 whitespace-nowrap
                 ${selectedTags.includes(tag)
                   ? 'bg-[#3958bd] text-white border-[#3958bd]'
                   : 'bg-white text-gray-600 border-gray-300'}
