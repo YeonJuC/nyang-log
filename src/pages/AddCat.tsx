@@ -30,25 +30,34 @@ const AddCat = () => {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user) return;
-
+  
     try {
-      await addDoc(collection(db, 'users', user.uid, 'cats'), {
+      const catRef = await addDoc(collection(db, 'users', user.uid, 'cats'), {
         nickname,
         age,
         species,
         profileImage: selectedCharacter,
         createdAt: new Date(),
       });
+  
+      const newCatId = catRef.id; // 추가된 고양이 ID 얻기
+  
+      // ✅ 고양이 추가하고 바로 리스트 새로 불러오기 + 새로 추가된 고양이 선택
+      await refreshProfileAndCats(newCatId);
+  
       alert('고양이 추가 완료!');
       navigate('/home'); // ✅ 추가 후 홈으로 이동
+  
     } catch (error) {
       console.error('고양이 추가 오류:', error);
     }
   };
+  
 
-  const handleCancel = () => {
-    navigate('/home'); // ✅ 취소 버튼 클릭 시 홈으로 이동
-  };
+  function handleCancel(event: React.MouseEvent<HTMLButtonElement>): void {
+    event.preventDefault();
+    // 취소 버튼 누르면 홈으로 이동하는 로직 추가
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center pt-12 px-6">
@@ -141,3 +150,7 @@ const AddCat = () => {
 };
 
 export default AddCat;
+function refreshProfileAndCats(newCatId: string) {
+  throw new Error('Function not implemented.');
+}
+
