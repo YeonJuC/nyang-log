@@ -131,17 +131,17 @@ const MyPage = () => {
         <h2 className="text-lg text-black font-apple_bold mb-6 mt-6">기본정보</h2>
 
         {editMode ? (
-          <div className="space-y-3">
+          <div className="space-y-3 mb-[100px]">
             <span className="text-gray-400 text-sm">반려묘 이름</span>
             <input
-              className="w-full border px-4 py-2 rounded text-sm mb-3"
+              className="w-full border px-4 py-2 rounded text-sm !mb-[12px]"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               placeholder="반려묘 이름"
             />
             <span className="text-gray-400 text-sm">반려묘 나이</span>
             <input
-              className="w-full border px-4 py-2 rounded text-sm mb-3"
+              className="w-full border px-4 py-2 rounded text-sm !mb-[12px]"
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="반려묘 나이"
@@ -156,7 +156,7 @@ const MyPage = () => {
             />
             <button
               onClick={handleSave}
-              className="w-full mt-6 bg-[#3958bd] text-white py-3 rounded-full text-sm font-semibold"
+              className="w-full !mt-[40px] bg-[#3958bd] text-white py-3 rounded-full text-sm font-semibold"
             >
               저장하기
             </button>

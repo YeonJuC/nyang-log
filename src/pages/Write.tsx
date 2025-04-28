@@ -149,7 +149,7 @@ const Write = () => {
     <div className="min-h-screen p-6 flex flex-col items-center bg-[#f9fafb]">
       <h2 className="text-xl font-apple_bigbold text-center mb-8 text-black">혼냥일기 작성</h2>
       <p className="text-left w-full max-w-md text-gray-500 font-apple text-sm px-8 mb-1">함께하는 반려묘 기록</p>
-      <p className="text-left w-full max-w-md text-black-300 font-apple_bold text-xl px-8 mb-2">오늘{selectedCat?.nickname ?? ''}의 모습을 <br/>간단히 기록해볼까요?</p>
+      <p className="text-left w-full max-w-md text-black-300 font-apple_bold text-xl px-8 mb-2">오늘 {selectedCat?.nickname ?? ''}의 모습을 <br/>간단히 기록해볼까요?</p>
 
       <div className="py-4 px-4 mb-4 flex flex-col items-center">
         <div className="grid grid-cols-2 gap-3 w-full max-w-md">
@@ -168,7 +168,7 @@ const Write = () => {
 
       <div className="bg-gray-100 border border-gray-200 text-sm text-gray-600 rounded-xl px-4 py-3 mb-10 max-w-md w-200 font-apple">
         ✍️ 예시: <span className="text-black">소파에 올라가서 낮잠을 잤어요</span><br /> → <span className="text-[#3958bd]">소파에 올라가서 낮잠을 잤어요 냥~으로 변경이 되어 저장이 됩니다.</span><br />
-        <span className="text-gray-400 block text-center text-sm ">(오늘 하루 저장하고 싶은 냥이의 순간을 기록해주세요.)</span>
+        <span className="text-black block text-center text-sm font-apple_bold mt-[5px] ">※하루에 하나만 기록을 추가할 수 있습니다!</span>
       </div>
       
       {/* 이미지 선택 제목 */}

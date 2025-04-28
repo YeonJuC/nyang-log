@@ -29,47 +29,65 @@ const Home = () => {
   const [todayDiary, setTodayDiary] = useState<string | null>(null);
   const { selectedCat } = useSelectedCat(); // ✅ 선택된 고양이 Context 불러오기
   const todayLogForSelectedCat = todayLog && selectedCat && todayLog.catId === selectedCat.id ? todayLog : null;
+  const [loadingUser, setLoadingUser] = useState(true);
 
   // 모든 기록 필터링
   const filteredLogs = selectedCat
     ? allLogs.filter((log) => log.catId === selectedCat.id)
     : [];
 
+    useEffect(() => {
+      const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+        if (firebaseUser) {
+          setUser(firebaseUser);
+        } else {
+          setUser(null);
+        }
+        setLoadingUser(false); // ✅ 무조건 로딩 끝났다고 알려줌
+      });
+    
+      return () => unsubscribe();
+    }, []);
+    
+
   useEffect(() => {
     const diary = localStorage.getItem('todayLog');
+
     if (diary) {
       setTodayDiary(diary);
     }
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser || !selectedCat) return; // 선택된 고양이 없으면 무시
-
-      setUser(currentUser);
-
-      try {
-        const q = query(
-          collection(db, 'logs', currentUser.uid, 'entries'),
-          orderBy('createdAt', 'desc')
-        );
-        const querySnapshot = await getDocs(q);
-        const fetchedLogs = querySnapshot.docs
-          .map((doc) => ({
-            ...doc.data(),
-            date: doc.id,
-          }))
-          // 여기서 선택된 고양이에 해당하는 로그만 필터링 (추후 필요하면 추가)
-          ;
-        setAllLogs(fetchedLogs);
-      } catch (e) {
-        console.error('Firestore 기록 불러오기 실패:', e);
+    const fetchTodayLog = async () => {
+      const user = auth.currentUser;
+      if (!user || !selectedCat) return;
+  
+      const q = query(
+        collection(db, 'logs', user.uid, 'entries'),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+  
+      const todayDate = new Date().toISOString().split('T')[0];
+  
+      const found = querySnapshot.docs
+        .map(doc => ({
+          ...(doc.data() as { createdDate: string; catId: string; text?: string; image?: string; }),
+          id: doc.id,
+        }))
+        .find(log => log.createdDate === todayDate && log.catId === selectedCat.id);
+  
+      if (found) {
+        setTodayLog(found);
+      } else {
+        setTodayLog(null);
       }
     };
-
-    fetchData();
-  }, [selectedCat]); // ✅ 고양이 선택이 바뀔 때마다 fetch
+  
+    fetchTodayLog();
+  }, [selectedCat]);
+  
 
   const handleLogin = async () => {
     try {
@@ -81,8 +99,31 @@ const Home = () => {
     }
   };
 
-  if (!user || !selectedCat) return null; // 선택된 고양이 없으면 렌더링 안 함
-
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-100px)] text-gray-400">
+        로딩 중...
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-100px)] text-gray-400">
+        로그인 후 이용해주세요
+      </div>
+    );
+  }
+  
+  if (!selectedCat) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-100px)] text-gray-400">
+        고양이 정보를 불러오는 중...
+      </div>
+    );
+  }
+  
+  
 
   return (
     <div className="min-h-screen bg-white">
@@ -172,7 +213,7 @@ const Home = () => {
             <br />
             <h1 className="text-left text-white font-apple_bigbold px-5 mt-8">• 일일 추억 저장</h1>
             <h3 className="text-lg text-white font-apple_bigbold text-gray-800 mb-4">📍 오늘 기록</h3>
-
+            
             {todayLogForSelectedCat ? (
               <div className="bg-white p-4 w-4/5 mx-auto rounded-2xl shadow-xl space-y-4">
                 {todayLogForSelectedCat.image && (

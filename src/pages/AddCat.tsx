@@ -31,7 +31,7 @@ interface CatInfo {
 
 const AddCat = () => {
   const navigate = useNavigate();
-  const { setSelectedCat, setCats } = useSelectedCat();
+  const { setSelectedCat, setCats, setSelectedCatId } = useSelectedCat();
 
   const [nickname, setNickname] = useState('');
   const [age, setAge] = useState('');
@@ -83,7 +83,8 @@ const AddCat = () => {
     const newlyAddedCat = catsList.find(cat => cat.id === newCatId);
     if (newlyAddedCat) {
       setSelectedCat(newlyAddedCat);
-    }
+      setSelectedCatId(newCatId);  // ✅ 여기서 추가한 고양이 ID를 선택
+    }      
   };
 
   return (
