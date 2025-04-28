@@ -4,6 +4,7 @@ import { signInWithPopup } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { saveServerDiary } from '../server/saveServerDiary';
 import { useSelectedCat } from '../utils/SelectedCatContext'; // ✅ 추가
+import { X } from 'lucide-react';
 
 import drawCat from '../img/draw_cat.png';
 import ch_1 from '../img/ch_1.png';
@@ -12,6 +13,22 @@ import ch_3 from '../img/ch_3.png';
 import ch_4 from '../img/ch_4.png';
 import ch_5 from '../img/ch_5.png';
 import ch_6 from '../img/ch_6.png';
+
+import activeCatImg from '../img/activeCat.png';
+import chillCatImg from '../img/chillCat.png';
+import explorerCatImg from '../img/explorerCat.png';
+import lovelyCatImg from '../img/lovelyCat.png';
+import partyCatImg from '../img/partyCat.png';
+import independentCatImg from '../img/independentCat.png';
+
+const catTypeImages = {
+  activeCat: activeCatImg,
+  chillCat: chillCatImg,
+  explorerCat: explorerCatImg,
+  lovelyCat: lovelyCatImg,
+  partyCat: partyCatImg,
+  independentCat: independentCatImg,
+};
 
 const profileImages: Record<string, string> = {
   ch_1,
@@ -22,6 +39,89 @@ const profileImages: Record<string, string> = {
   ch_6,
 };
 
+export const catTypes = {
+  activeCat: {
+    name: "활발한 활동 고양이",
+    description: "항상 움직이고 놀기를 좋아하는 에너지 넘치는 고양이에요. 새로운 자극을 즐기고 활발히 탐험합니다!",
+    message: "🏃‍♂️ 세상을 뛰어다니는 에너자이저냥!"
+  },
+  chillCat: {
+    name: "느긋한 집냥이",
+    description: "편안한 공간을 좋아하고 주로 낮잠을 즐기는 고양이에요. 느긋하고 안정적인 성격입니다.",
+    message: "😴 낮잠이 최고냥! 포근포근 집냥이"
+  },
+  explorerCat: {
+    name: "호기심 많은 탐험가",
+    description: "새로운 장소, 냄새, 소리에 흥미를 느끼며 적극적으로 탐험하는 고양이에요!",
+    message: "🔎 세상은 모험으로 가득한 탐험냥!"
+  },
+  lovelyCat: {
+    name: "애교 폭발 꾹꾹이",
+    description: "항상 보호자 주변을 맴돌며 애정을 표현하는 귀여운 고양이에요. 꾹꾹이도 자주 합니다!",
+    message: "💖 사랑을 듬뿍 주는 꾹꾹이 장인냥!"
+  },
+  partyCat: {
+    name: "외향적 파티냥이",
+    description: "낯선 사람, 낯선 동물도 겁내지 않고 다가가는 외향적인 성격의 고양이에요!",
+    message: "🎉 모두랑 친구 되는 파티냥!"
+  },
+  independentCat: {
+    name: "독립적인 혼자냥이",
+    description: "혼자 있는 걸 좋아하고 스스로 시간을 보내는 걸 즐기는 고양이에요. 조용하고 차분한 성격입니다.",
+    message: "🌙 혼자만의 시간이 소중한 고독냥"
+  }
+};
+
+
+const testQuestions = [
+  {
+    question: "새로운 공간에 들어갔을 때 나는?",
+    options: [
+      { text: "바로 이리저리 탐색한다", type: 'activeCat' },
+      { text: "편안한 자리를 찾는다", type: 'chillCat' },
+      { text: "조심스럽게 냄새를 맡으며 다닌다", type: 'explorerCat' },
+      { text: "그냥 구석에 앉아 지켜본다", type: 'independentCat' },
+    ],
+  },
+  {
+    question: "누군가 나에게 다가오면 나는?",
+    options: [
+      { text: "반가워서 먼저 다가간다", type: 'partyCat' },
+      { text: "조금 거리를 두고 본다", type: 'independentCat' },
+      { text: "얼른 가서 부비부비한다", type: 'lovelyCat' },
+      { text: "호기심은 있지만 다가가진 않는다", type: 'explorerCat' },
+    ],
+  },
+  {
+    question: "혼자 있을 때 나는?",
+    options: [
+      { text: "새로운 걸 찾아 돌아다닌다", type: 'explorerCat' },
+      { text: "가만히 쉬거나 잔다", type: 'chillCat' },
+      { text: "장난감을 가지고 논다", type: 'activeCat' },
+      { text: "그리워하며 누군가 기다린다", type: 'lovelyCat' },
+    ],
+  },
+  {
+    question: "어떤 장소를 좋아하나요?",
+    options: [
+      { text: "넓고 활발한 공간", type: 'activeCat' },
+      { text: "아늑하고 조용한 곳", type: 'chillCat' },
+      { text: "새로운 냄새가 나는 곳", type: 'explorerCat' },
+      { text: "사람들이 많은 곳", type: 'partyCat' },
+    ],
+  },
+  {
+    question: "내 성격을 한마디로 표현하면?",
+    options: [
+      { text: "호기심 왕", type: 'explorerCat' },
+      { text: "집순이/집돌이", type: 'chillCat' },
+      { text: "에너지 폭발", type: 'activeCat' },
+      { text: "사랑꾼", type: 'lovelyCat' },
+    ],
+  },
+];
+
+
 const Home = () => {
   const [user, setUser] = useState<any>(null);
   const [todayLog, setTodayLog] = useState<any>(null);
@@ -30,6 +130,20 @@ const Home = () => {
   const { selectedCat } = useSelectedCat(); // ✅ 선택된 고양이 Context 불러오기
   const todayLogForSelectedCat = todayLog && selectedCat && todayLog.catId === selectedCat.id ? todayLog : null;
   const [loadingUser, setLoadingUser] = useState(true);
+  const [openTypePopup, setOpenTypePopup] = useState(false);
+  const [catTypeKey, setCatTypeKey] = useState<'activeCat' | 'chillCat' | 'explorerCat' | 'lovelyCat' | 'partyCat' | 'independentCat'>('activeCat');
+  // 🐾 테스트 상태
+  const [isTesting, setIsTesting] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const [catTypesByProfile, setCatTypesByProfile] = useState<Record<string, keyof typeof catTypes>>({});
+  const currentTypeKey = selectedCat ? catTypesByProfile[selectedCat.id] || 'activeCat' : 'activeCat';
+
+  const startTest = () => {
+    setIsTesting(true);
+    setCurrentQuestionIndex(0);
+    setScores({});
+  };
   
   // 모든 기록 필터링
   const filteredLogs = selectedCat
@@ -57,6 +171,20 @@ const Home = () => {
       setTodayDiary(diary);
     }
   }, []);
+
+  useEffect(() => {
+    const savedType = localStorage.getItem('catTypeKey') as keyof typeof catTypes;
+    if (savedType && catTypes[savedType]) {
+      setCatTypeKey(savedType);
+    }
+  }, []);  
+
+  useEffect(() => {
+    const saved = localStorage.getItem('catTypesByProfile');
+    if (saved) {
+      setCatTypesByProfile(JSON.parse(saved));
+    }
+  }, []);  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,6 +239,43 @@ const Home = () => {
       console.error('로그인 실패:', e);
     }
   };
+
+  const handleAnswer = (type: string) => {
+    setScores((prev) => ({
+      ...prev,
+      [type]: (prev[type] || 0) + 1,
+    }));
+  
+    if (currentQuestionIndex + 1 < testQuestions.length) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      const result = getResult();
+      if (selectedCat) {
+        const updated = {
+          ...catTypesByProfile,
+          [selectedCat.id]: result,
+        };
+        setCatTypesByProfile(updated);
+        localStorage.setItem('catTypesByProfile', JSON.stringify(updated)); // ✅ 저장
+      }
+      setIsTesting(false);
+    }
+  };  
+  
+  const getResult = () => {
+    let maxScore = 0;
+    let selectedType = 'activeCat';
+  
+    Object.entries(scores).forEach(([type, score]) => {
+      if (score > maxScore) {
+        maxScore = score;
+        selectedType = type;
+      }
+    });
+  
+    return selectedType as keyof typeof catTypes;
+  };
+  
 
   if (loadingUser) {
     return (
@@ -175,7 +340,12 @@ const Home = () => {
               독립적인 혼자냥이:	혼자 있는 걸 좋아함  */}
               
               {/*<p className="text-2xl text-[#3958bd] font-jua mt-1">{catType}</p>*/}
-              <p className="text-2xl text-[#3958bd] font-jua mt-1">활발한 활동 고양이</p>
+              <p
+                onClick={() => setOpenTypePopup(true)}
+                className="text-2xl text-[#3958bd] font-jua mt-1 cursor-pointer hover:underline"
+              >
+                {catTypes[currentTypeKey].name}
+              </p>
               <p className="text-sm font-apple mt-4">안녕하세요!</p>
               <p className="text-sm font-apple">오늘 {selectedCat?.nickname ?? ''}의 하루를 보여드릴게요!</p>
             </div>
@@ -277,6 +447,68 @@ const Home = () => {
                 기록 추가하기
               </a>
             </div>
+          </div>
+        </div>
+      )}
+      {isTesting && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-[90%] max-w-sm text-center">
+            <h2 className="text-lg font-bold mb-4 text-[#3958bd]">
+              {testQuestions[currentQuestionIndex].question}
+            </h2>
+            <div className="flex flex-col gap-3">
+              {testQuestions[currentQuestionIndex].options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswer(option.type)}
+                  className="px-4 py-2 bg-[#f4f6ff] text-[#3958bd] rounded-full text-sm hover:bg-[#d5defc]"
+                >
+                  {option.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {openTypePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">
+          <div className="bg-white rounded-2xl p-6 w-[90%] max-w-sm text-center transform transition-transform duration-300 ease-in-out scale-100">
+            
+            {/* 닫기 버튼 */}
+            <button
+              onClick={() => setOpenTypePopup(false)}
+              className="absolute top-4 right-4 text-gray-700 hover:text-gray-300"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* 고양이 타입 이름 */}
+            <h2 className="text-xl font-bold mb-2 text-[#3958bd]">{catTypes[currentTypeKey].name}</h2>
+
+            {/* 고양이 타입 이미지 */}
+            <div className="w-24 h-24 mx-auto mb-4">
+              <img src={catTypeImages[currentTypeKey]} alt="타입 이미지" className="object-cover w-full h-full" />
+            </div>
+
+            <div className="bg-[#f4f6ff] text-[#3958bd] text-sm rounded-xl px-4 py-3 mb-6 max-w-xs mx-auto relative">
+              {/*<div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#f4f6ff] rotate-45"></div> */}
+              {catTypes[currentTypeKey].message}
+            </div>
+
+            {/* 고양이 설명 */}
+            <p className="text-sm text-gray-700 mb-6">{catTypes[currentTypeKey].description}</p>
+
+            {/* 테스트 다시 해보기 버튼 */}
+            <button
+              className="px-4 py-2 bg-[#3958bd] text-white rounded-full text-sm"
+              onClick={() => {
+                setOpenTypePopup(false);
+                startTest();
+              }}
+            >
+              테스트 다시 해보기
+            </button>
+
           </div>
         </div>
       )}
