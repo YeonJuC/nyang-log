@@ -55,51 +55,35 @@ export const SelectedCatProvider = ({ children }: { children: ReactNode }) => {
   const refreshProfileAndCats = async (keepSelectedId?: string) => {
     const user = auth.currentUser;
     if (!user) return;
-
+  
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (!userDoc.exists()) return;
     const profileData = userDoc.data();
-
+  
     setProfile({
       nickname: profileData?.nickname || '',
       age: profileData?.age || '',
       species: profileData?.species || '',
       profileImage: profileData?.profileImage || 'ch_1',
     });
-
+  
     const catsSnap = await getDocs(collection(db, 'users', user.uid, 'cats'));
     const catList = catsSnap.docs.map(doc => ({
       id: doc.id,
       ...(doc.data() as Omit<CatInfo, 'id'>),
     }));
-
+  
     setCats(catList);
-
-    // 🔥 고정: 앱 처음에는 무조건 'profile'을 선택
+  
     const targetId = keepSelectedId || 'profile';
-
+  
     if (targetId === 'profile') {
-      setSelectedCat({
-        id: 'profile',
-        nickname: profileData?.nickname || '',
-        age: profileData?.age || '',
-        species: profileData?.species || '',
-        profileImage: profileData?.profileImage || 'ch_1',
-      });
-      setSelectedCatId('profile');
-    } else {
-      const found = catList.find(c => c.id === targetId);
-      if (found) {
-        setSelectedCat({
-          id: found.id,
-          nickname: found.nickname ?? '',
-          age: found.age ?? '',
-          species: found.species ?? '',
-          profileImage: found.profileImage ?? 'ch_1',
-        });
-        setSelectedCatId(found.id);
+      // 프로필 이름이 비어있으면, 가장 최근 고양이 선택
+      if (!profileData?.nickname && catList.length > 0) {
+        const latestCat = catList[catList.length - 1];
+        setSelectedCat(latestCat);
+        setSelectedCatId(latestCat.id);
       } else {
-        // 못 찾으면 fallback
         setSelectedCat({
           id: 'profile',
           nickname: profileData?.nickname || '',
@@ -109,8 +93,29 @@ export const SelectedCatProvider = ({ children }: { children: ReactNode }) => {
         });
         setSelectedCatId('profile');
       }
+    } else {
+      const found = catList.find(c => c.id === targetId);
+      if (found) {
+        setSelectedCat(found);
+        setSelectedCatId(found.id);
+      } else {
+        if (catList.length > 0) {
+          const latestCat = catList[catList.length - 1];
+          setSelectedCat(latestCat);
+          setSelectedCatId(latestCat.id);
+        } else {
+          setSelectedCat({
+            id: 'profile',
+            nickname: profileData?.nickname || '',
+            age: profileData?.age || '',
+            species: profileData?.species || '',
+            profileImage: profileData?.profileImage || 'ch_1',
+          });
+          setSelectedCatId('profile');
+        }
+      }
     }
-  };
+  };  
 
   return (
     <SelectedCatContext.Provider value={{

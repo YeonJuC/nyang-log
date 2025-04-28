@@ -344,7 +344,7 @@ const History = () => {
         </div>
       )}
 
-      <div className="bg-white text-black rounded-t-3xl px-4 py-6 min-h-[calc(100vh-220px)]">
+      <div className="bg-white text-black rounded-t-3xl px-4 py-6 mb-[90px] min-h-[calc(100vh-220px)]">
         {/* ✅ 최근 5일치 기록 여부 스탬프 UI */}
         <div className="bg-white text-black px-4 pt-1 mb-4">
           <div className="flex justify-between w-full">
@@ -376,11 +376,19 @@ const History = () => {
                     <img src={log.image} alt={`log-${i}`} className="w-full h-full object-cover" />
                   </div>
                 )}
+                {/* 🐾 추가: 날짜 표시 */}
+                <p className="text-xs text-gray-400 mb-1">{log.createdDate}</p>
                 <p className="text-sm font-semibold mb-1 whitespace-pre-line">{log.text}</p>
                 {log.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2 text-xs text-[#3958bd] font-apple">
+                  <div className="flex flex-wrap gap-2 mt-2 w-full break-words">
                     {log.tags.map((tag: string, idx: number) => (
-                      <span key={idx}>#{tag}</span>
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-[#f4f6ff] text-[#3958bd] text-[11px] rounded-full font-apple_bold 
+                                  transition-all duration-300 ease-in-out hover:bg-[#d5defc] hover:text-[#2c3e94]"
+                      >
+                        #{tag}
+                      </span>
                     ))}
                   </div>
                 )}
