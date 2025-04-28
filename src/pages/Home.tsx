@@ -30,7 +30,7 @@ const Home = () => {
   const { selectedCat } = useSelectedCat(); // ✅ 선택된 고양이 Context 불러오기
   const todayLogForSelectedCat = todayLog && selectedCat && todayLog.catId === selectedCat.id ? todayLog : null;
   const [loadingUser, setLoadingUser] = useState(true);
-
+  
   // 모든 기록 필터링
   const filteredLogs = selectedCat
     ? allLogs.filter((log) => log.catId === selectedCat.id)
@@ -59,34 +59,47 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchTodayLog = async () => {
-      const user = auth.currentUser;
-      if (!user || !selectedCat) return;
+    const fetchData = async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser || !selectedCat) return;
   
       const q = query(
-        collection(db, 'logs', user.uid, 'entries'),
+        collection(db, 'logs', currentUser.uid, 'entries'),
         orderBy('createdAt', 'desc')
       );
       const querySnapshot = await getDocs(q);
   
-      const todayDate = new Date().toISOString().split('T')[0];
+      const fetchedLogs = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          docId: doc.id,
+          text: data.text ?? '',
+          tags: data.tags ?? [],
+          image: data.image ?? '',
+          createdDate: typeof data.createdDate === 'string'
+            ? data.createdDate
+            : (data.createdDate?.toDate?.().toISOString().split('T')[0] || doc.id),
+          catId: data.catId ?? null,
+        };
+      });
   
-      const found = querySnapshot.docs
-        .map(doc => ({
-          ...(doc.data() as { createdDate: string; catId: string; text?: string; image?: string; }),
-          id: doc.id,
-        }))
-        .find(log => log.createdDate === todayDate && log.catId === selectedCat.id);
-  
-      if (found) {
-        setTodayLog(found);
-      } else {
-        setTodayLog(null);
-      }
+      setAllLogs(fetchedLogs);
     };
   
-    fetchTodayLog();
-  }, [selectedCat]);
+    fetchData();
+  }, [selectedCat]);  
+  
+  useEffect(() => {
+    if (!selectedCat || allLogs.length === 0) return;
+  
+    const todayDate = new Date().toISOString().split('T')[0];
+  
+    const foundTodayLog = allLogs.find((log) => 
+      log.createdDate === todayDate && log.catId === selectedCat.id
+    );
+  
+    setTodayLog(foundTodayLog ?? null);
+  }, [selectedCat, allLogs]);
   
 
   const handleLogin = async () => {
@@ -121,9 +134,7 @@ const Home = () => {
         고양이 정보를 불러오는 중...
       </div>
     );
-  }
-  
-  
+  }  
 
   return (
     <div className="min-h-screen bg-white">
