@@ -16,6 +16,7 @@ import Landing from './pages/Landing';
 import './App.css'; 
 import ScrollToTop from './components/ScrollToTop';
 import AddCat from './pages/AddCat';
+import Diary from './pages/Diary';
 
 function AppRoutes() {
   const [user, setUser] = useState<any>(null);
@@ -79,6 +80,7 @@ function AppRoutes() {
             <Route path="/history" element={<AppLayout><History /></AppLayout>} />
             <Route path="/mypage" element={<AppLayout><MyPage /></AppLayout>} />
             <Route path="/add-cat" element={<AppLayout><AddCat /></AppLayout>} />
+            <Route path="/diary" element={<AppLayout><Diary /></AppLayout>} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         )}

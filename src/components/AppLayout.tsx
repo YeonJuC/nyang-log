@@ -12,6 +12,9 @@ import historyDefault from '../img/히스토리.png';
 import historyActive from '../img/히스토리_변경.png';
 import mypageDefault from '../img/마이페이지.png';
 import mypageActive from '../img/마이페이지_변경.png';
+import diaryDefault from '../img/일기.png';  
+import diaryActive from '../img/일기_변경.png'; 
+
 import logoIcon from '../img/icon-192x192.png';
 import ch_1 from '../img/ch_1.png';
 import ch_2 from '../img/ch_2.png';
@@ -142,6 +145,10 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <Link to="/home" className="flex flex-col items-center">
             <img src={location.pathname === '/home' ? homeActive : homeDefault} alt="홈" className="w-6 h-6" />
             <span className={location.pathname === '/home' ? 'text-[#3958bd]' : 'text-gray-600'}>홈</span>
+          </Link>
+          <Link to="/diary" className="flex flex-col items-center"> 
+            <img src={location.pathname === '/diary' ? diaryActive : diaryDefault} alt="일기" className="w-6 h-6" />
+            <span className={location.pathname === '/diary' ? 'text-[#3958bd]' : 'text-gray-600'}>일기</span>
           </Link>
           <Link to="/write" className="flex flex-col items-center">
             <img src={location.pathname === '/write' ? writeActive : writeDefault} alt="기록" className="w-6 h-6" />

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { auth, provider, db } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
-import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
-import { saveServerDiary } from '../server/saveServerDiary';
+import { collection, getDocs, query, orderBy, doc, getDoc, setDoc } from 'firebase/firestore';
+
 import { useSelectedCat } from '../utils/SelectedCatContext'; // ✅ 추가
 import { X } from 'lucide-react';
 
@@ -20,6 +20,7 @@ import explorerCatImg from '../img/explorerCat.png';
 import lovelyCatImg from '../img/lovelyCat.png';
 import partyCatImg from '../img/partyCat.png';
 import independentCatImg from '../img/independentCat.png';
+import { useRef } from 'react';  
 
 const catTypeImages = {
   activeCat: activeCatImg,
@@ -38,6 +39,7 @@ const profileImages: Record<string, string> = {
   ch_5,
   ch_6,
 };
+
 
 export const catTypes = {
   activeCat: {
@@ -121,7 +123,6 @@ const testQuestions = [
   },
 ];
 
-
 const Home = () => {
   const [user, setUser] = useState<any>(null);
   const [todayLog, setTodayLog] = useState<any>(null);
@@ -138,6 +139,69 @@ const Home = () => {
   const [scores, setScores] = useState<Record<string, number>>({});
   const [catTypesByProfile, setCatTypesByProfile] = useState<Record<string, keyof typeof catTypes>>({});
   const currentTypeKey = selectedCat ? catTypesByProfile[selectedCat.id] || 'activeCat' : 'activeCat';
+  const [isTodayDiarySaved, setIsTodayDiarySaved] = useState(false);
+
+  const [saving, setSaving] = useState(false); // ✅ 저장 중 상태 추가
+  const todayDiaryRef = useRef<HTMLDivElement>(null);
+
+  const getTodayString = () => {
+    const today = new Date();
+    return `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+  };
+  
+  const generateDiaryFromServer = async (events: any[]) => {
+    const response = await fetch('http://127.0.0.1:5000/generate-diary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ events }),
+    });
+  
+    if (!response.ok) {
+      throw new Error('일기 생성 실패');
+    }
+  
+    const data = await response.json();
+    return data; // { day, diary }
+  };
+  
+  const saveDiaryToFirestore = async (catId: string, day: string, diary: string) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('로그인 필요');
+  
+    const diaryRef = doc(db, 'users', currentUser.uid, 'cats', catId, 'diaries', day);
+    await setDoc(diaryRef, { day, diary });
+  };
+
+  const today = new Date();
+  const todayString = `${today.getFullYear()}년 ${String(today.getMonth() + 1).padStart(2, '0')}월 ${String(today.getDate()).padStart(2, '0')}일`;
+
+  const events: any[] = [
+    { time: `${todayString} 08:00`, emotions: "공포", behaviors: "팔을 뻗어 휘젓거림" },
+    { time: `${todayString} 14:00`, emotions: "편안함", behaviors: "식빵 자세" },
+    { time: `${todayString} 19:00`, emotions: "행복", behaviors: "걷거나 뜀" }
+  ];
+
+  const generateAndSaveDiary = async (selectedCat: any, events: any[]) => {
+    if (!selectedCat) return;
+  
+    setSaving(true);
+    try {
+      const { day, diary } = await generateDiaryFromServer(events);
+      await saveDiaryToFirestore(selectedCat.id, day, diary);
+      await fetchTodayDiary(); // 저장 후 오늘 일기 다시 불러오기
+      alert('오늘 일기가 저장되었습니다!');
+
+      // ✅ 저장 완료 후 부드럽게 스크롤 이동
+      setTimeout(() => {
+        todayDiaryRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 300); // 약간 딜레이 주면 더 부드러움
+    } catch (error) {
+      console.error('에러 발생:', error);
+      alert('일기 생성 또는 저장 실패');
+    } finally {
+      setSaving(false);
+    }
+  };  
 
   const startTest = () => {
     setIsTesting(true);
@@ -162,6 +226,30 @@ const Home = () => {
     
       return () => unsubscribe();
     }, []);
+    
+    useEffect(() => {
+      if (selectedCat) {
+        fetchTodayDiary(); // 오늘(day) 일기 Firestore에서 읽어오기
+      }
+    }, [selectedCat]);
+
+
+    const fetchTodayDiary = async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser || !selectedCat) return;
+    
+      const today = getTodayString();
+      const diaryRef = doc(db, 'users', currentUser.uid, 'cats', selectedCat.id, 'diaries', today);
+      const diarySnap = await getDoc(diaryRef);
+    
+      if (diarySnap.exists()) {
+        setTodayDiary(diarySnap.data().diary); // 오늘 일기 세팅
+        setIsTodayDiarySaved(true);            // 저장 완료 상태 세팅
+      } else {
+        setTodayDiary(null);                   // 오늘 일기 없음
+        setIsTodayDiarySaved(false);            // 버튼 다시 보여주기
+      }
+    };
     
 
   useEffect(() => {
@@ -217,11 +305,12 @@ const Home = () => {
     fetchData();
   }, [selectedCat]);  
   
+  
   useEffect(() => {
     if (!selectedCat || allLogs.length === 0) return;
   
     const todayDate = new Date().toISOString().split('T')[0];
-  
+    
     const foundTodayLog = allLogs.find((log) => 
       log.createdDate === todayDate && log.catId === selectedCat.id
     );
@@ -374,20 +463,31 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="w-full mt-6 flex justify-center">
-              <button
-                onClick={saveServerDiary}
-                className="block w-full h-[50px] w-[275px] max-w-xs px-5 py-2 bg-white text-[#5976D7] text-sm font-apple_sobigbold rounded-full shadow hover:shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2"
-              >
-                오늘 일기 자동 생성하기
-              </button>
-            </div>
+            {/* 오늘 일기 저장 버튼: 아직 저장 안했으면 보임 */}
+            {!isTodayDiarySaved && (
+              <div className="flex justify-center mt-6 mb-6">
+                <button
+                  onClick={() => generateAndSaveDiary(selectedCat, events)}
+                  disabled={saving}
+                  className="w-[240px] h-[40px] px-6 py-2 bg-white text-[#5976D7] font-apple_bold text-sm rounded-full shadow hover:scale-105 transition"
+                >
+                  {saving ? "저장 중..." : "오늘 일기 자동 생성하기"}
+                </button>
+              </div>
+            )}
 
-            {/* 감성 일기 표시 */}
+            {/* 오늘 감성 일기 박스: 저장했으면 보임 */}
             {todayDiary && (
-              <div className="bg-white p-4 mt-6 rounded-xl shadow">
-                <h3 className="text-lg font-bold mb-2 text-[#3958bd]">🐾 오늘의 감성 일기</h3>
-                <p className="text-sm whitespace-pre-line font-apple">{todayDiary}</p>
+              <div
+                ref={todayDiaryRef}
+                className="bg-white border border-[#ccc] rounded-2xl shadow-md p-6 text-center space-y-4 w-4/5 mx-auto mt-6"
+              >
+                <h3 className="text-xl font-bold text-[#3958bd] flex items-center justify-center gap-2 font-jua">
+                  <span>🐾</span> 오늘의 감성 일기
+                </h3>
+                <div className="text-gray-700 text-sm whitespace-pre-line font-apple leading-relaxed">
+                  {todayDiary}
+                </div>
               </div>
             )}
 
@@ -517,6 +617,3 @@ const Home = () => {
 };
 
 export default Home;
-
-
-
