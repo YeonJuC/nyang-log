@@ -1,0 +1,20 @@
+{
+  "short_name": "냥찰일지",
+  "name": "냥찰일지 - 반려묘 일기",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#5976D7",
+  "background_color": "#ffffff"
+}
