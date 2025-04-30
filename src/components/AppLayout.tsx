@@ -28,12 +28,9 @@ const characterImages: Record<string, string> = { ch_1, ch_2, ch_3, ch_4, ch_5, 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const {
-    selectedCat,
     setSelectedCat,
     profile,
-    setProfile,
     cats,
-    setCats,
     selectedCatId,
     setSelectedCatId,
     refreshProfileAndCats,
