@@ -110,19 +110,26 @@ const Diary = () => {
   
     return (
       <div className="min-h-screen bg-white p-4 mb-[100px]">
-        <div className="relative py-6 text-center">
+        <div className="bg-white px-4 py-3 flex flex-col items-center">
+          <div className="w-full max-w-xl text-center">
             <h2 className="text-xl font-apple_bigbold">일기장</h2>
-            <h1 className="text-base font-apple_bold text-base mt-2 mb-1">오늘 {selectedCat?.nickname ?? ''}의 하루를 볼까요?</h1>
-            <p className="w-full max-w-md text-black-300 font-apple_bold text-[13px] mb-2">아래 오늘 하루 일기 저장 버튼을 누르면<br /> 오늘의 일기가 나옵니다.</p>
-        </div>
-        <div className="bg-white border border-[#ccc] rounded-2xl shadow-md p-4 flex flex-col items-center w-[280px] mx-auto space-y-4 mb-4">
-            <div className="w-48 mx-auto my-4">
-                <img
+            <h1 className="text-base sm:text-lg font-apple_bold mt-2 mb-1">
+              오늘 {selectedCat?.nickname ?? ''}의 하루를 볼까요?
+            </h1>
+            <p className="text-black-300 font-apple_bold text-sm sm:text-[13px] mb-4">
+              아래 오늘 하루 일기 저장 버튼을 누르면<br /> 오늘의 일기가 나옵니다.
+            </p>
+          </div>
+
+          <div className="bg-white border border-[#ccc] rounded-2xl shadow-md p-4 w-full max-w-sm flex flex-col items-center space-y-4 mb-3">
+            <div className="w-40 sm:w-48 mx-auto my-4">
+              <img
                 src={profileImages[selectedCat.profileImage]}
                 alt="프로필 이미지"
-                className="w-full"
-                />
+                className="w-full object-contain"
+              />
             </div>
+          </div>
         </div>
         <div className="space-y-6 w-4/5 mx-auto">
           {diaries.map((diary) => (
