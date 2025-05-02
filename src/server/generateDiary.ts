@@ -20,12 +20,13 @@ const openai = new OpenAI({
 });
 
 app.post('/generate-diary', async (req, res) => {
+
     try {
       const { date, events, emotion } = req.body;
       const prompt = createDiaryPrompt({ date, events, emotion });
   
       const result = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: '너는 고양이의 하루를 감성적으로 정리하는 일기 작가야.' },
           { role: 'user', content: prompt }

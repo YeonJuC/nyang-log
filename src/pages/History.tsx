@@ -174,7 +174,9 @@ const History = () => {
         const data = doc.data();
         const createdDate = typeof data.createdDate === 'string'
           ? data.createdDate
-          : (data.createdDate?.toDate?.().toISOString().split('T')[0] || doc.id);
+          : data.createdDate?.toDate?.()
+            ? new Date(data.createdDate.toDate().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]
+            : doc.id;
 
         return {
           docId: doc.id,
@@ -208,13 +210,24 @@ const History = () => {
     if (!value) return;
     const selected = Array.isArray(value) ? value[0] : value;
     if (!selected || !(selected instanceof Date)) return;
-
-    const dateStr = selected.toISOString().split('T')[0];
+  
+    // ✅ 기존 코드 (UTC): const dateStr = selected.toISOString().split('T')[0];
+    // ✅ 수정된 코드 (KST)
+    const kstDate = new Date(selected.getTime() + 9 * 60 * 60 * 1000);
+    const dateStr = kstDate.toISOString().split('T')[0];
+  
     setSelectedDate(dateStr);
     setShowModal(null);
   };
+  
 
-  const visibleLogs = selectedDate ? logs.filter((log) => log.createdDate === selectedDate) : logs;
+  const visibleLogs = selectedDate
+    ? logs.filter((log) => {
+        const logDate = new Date(log.createdDate);
+        const kstDateStr = new Date(logDate.getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+        return kstDateStr === selectedDate;
+      })
+    : logs;
 
   const handleEditClick = (log: any) => {
     setEditTarget(log);
@@ -226,11 +239,12 @@ const History = () => {
   const recentDays = Array.from({ length: 5 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (4 - i)); // 오늘 포함 최근 5일
+    const kstDate = new Date(d.getTime() + 9 * 60 * 60 * 1000); // KST 보정
     return {
-      date: d.toISOString().split('T')[0],
-      day: d.toLocaleDateString('ko-KR', { weekday: 'short' }), // 예: 월, 화
+      date: kstDate.toISOString().split('T')[0],
+      day: kstDate.toLocaleDateString('ko-KR', { weekday: 'short' }), // 예: 월, 화
     };
-  });
+  });  
 
   const recordedDates = logs
   .filter(log => log.text?.trim() !== '')

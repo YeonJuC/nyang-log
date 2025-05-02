@@ -22,9 +22,9 @@ export const saveServerDiary = async () => {
     };
 
     // 프롬프트 생성
-    const prompt = generateDiaryPrompt(testData);  // generateDiaryPrompt 로컬에서 정의한 함수
+    const apiUrl = import.meta.env.VITE_API_URL;
 
-    const response = await fetch('http://localhost:3000/generate-diary', {  // 여기 URL 확인
+    const response = await fetch(`${apiUrl}/generate-diary`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,6 @@ export const saveServerDiary = async () => {
         emotion: '호기심, 억울함, 평온함',
       }),
     });
-    
 
     const result = await response.json();
     console.log('서버 응답:', result);  // 서버 응답 내용 출력
