@@ -1,4 +1,4 @@
-import { auth } from "../firebase";
+{/**import { auth } from "../firebase";
 import { generateDiaryPrompt } from '../utils/generateDiaryPrompt';
 
 
@@ -56,3 +56,24 @@ export const saveServerDiary = async () => {
     alert('서버에서 분석 결과를 가져오는 데 실패했어요.');
   }
 };
+ */}
+
+ // saveServerDiary.ts (수정됨)
+// saveServerDiary.ts (수정된 버전)
+import { getTodayDiaryContent } from '../utils/mockLLMResponse'; // ✅ 올바른 경로
+import { getCurrentDateString } from '../utils/dateUtils';
+import { useSelectedCat } from '../utils/SelectedCatContext'; // ✅ 훅 import
+
+export const saveServerDiary = async () => {
+  const { selectedCat } = useSelectedCat(); // ✅ context에서 selectedCat 접근
+  const today = getCurrentDateString();
+
+  const { content } = await getTodayDiaryContent();
+
+  const localKey = `diary_${today}_${selectedCat?.id || 'default'}`;
+  localStorage.setItem(localKey, content);
+
+  console.log("✅ 일기 로컬에 저장됨:", localKey);
+};
+
+

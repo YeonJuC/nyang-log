@@ -35,14 +35,14 @@ interface SelectedCatContextType {
 // ✅ context 생성
 const SelectedCatContext = createContext<SelectedCatContextType>({
   selectedCat: null,
-  setSelectedCat: () => {},
+  setSelectedCat: () => { },
   profile: null,
-  setProfile: () => {},
-  refreshProfileAndCats: async () => {},
+  setProfile: () => { },
+  refreshProfileAndCats: async () => { },
   cats: [],
-  setCats: () => {},
+  setCats: () => { },
   selectedCatId: null,
-  setSelectedCatId: () => {},
+  setSelectedCatId: () => { },
 });
 
 // ✅ Provider 컴포넌트

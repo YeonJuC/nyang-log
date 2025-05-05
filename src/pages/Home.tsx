@@ -3,7 +3,6 @@ import { auth, provider, db } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, doc, getDoc, setDoc } from 'firebase/firestore';
 
-import { useSelectedCat } from '../utils/SelectedCatContext'; // ✅ 추가
 import { X } from 'lucide-react';
 
 import drawCat from '../img/draw_cat.png';
@@ -21,6 +20,11 @@ import lovelyCatImg from '../img/lovelyCat.png';
 import partyCatImg from '../img/partyCat.png';
 import independentCatImg from '../img/independentCat.png';
 import { useRef } from 'react';  
+
+import { saveServerDiary } from '../server/saveServerDiary';
+import { useSelectedCat } from '../utils/SelectedCatContext';
+import { getTodayDiaryContent } from '../utils/mockLLMResponse';
+
 
 const catTypeImages = {
   activeCat: activeCatImg,
@@ -143,12 +147,21 @@ const Home = () => {
 
   const [saving, setSaving] = useState(false); // ✅ 저장 중 상태 추가
   const todayDiaryRef = useRef<HTMLDivElement>(null);
+  const [diaries, setDiaries] = useState<{ id: string; day: string; diary: string }[]>([]);
 
   const getTodayString = () => {
     const today = new Date();
     return `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
   };
   
+  const todayDate = getTodayString(); // "YYYY-MM-DD" 형식 문자열
+  const events = [
+    { time: `${todayDate} 08:00`, emotions: "공포", behaviors: "팔을 뻗어 휘젓거림" },
+    { time: `${todayDate} 14:00`, emotions: "편안함", behaviors: "식빵 자세" },
+    { time: `${todayDate} 19:00`, emotions: "행복", behaviors: "걷거나 뜀" }
+  ];
+
+
   const generateDiaryFromServer = async (events: any[]) => {
     const response = await fetch('http://127.0.0.1:5000/generate-diary', {
       method: 'POST',
@@ -169,39 +182,78 @@ const Home = () => {
     if (!currentUser) throw new Error('로그인 필요');
   
     const diaryRef = doc(db, 'users', currentUser.uid, 'cats', catId, 'diaries', day);
-    await setDoc(diaryRef, { day, diary });
-  };
+    await setDoc(diaryRef, { day, diary }); // ✅ 여기서 day 추가되어야 함
+  };  
 
   const today = new Date();
   const todayString = `${today.getFullYear()}년 ${String(today.getMonth() + 1).padStart(2, '0')}월 ${String(today.getDate()).padStart(2, '0')}일`;
 
-  const events: any[] = [
-    { time: `${todayString} 08:00`, emotions: "공포", behaviors: "팔을 뻗어 휘젓거림" },
-    { time: `${todayString} 14:00`, emotions: "편안함", behaviors: "식빵 자세" },
-    { time: `${todayString} 19:00`, emotions: "행복", behaviors: "걷거나 뜀" }
-  ];
-
-  const generateAndSaveDiary = async (selectedCat: any, events: any[]) => {
+  {/**const generateAndSaveDiary = async (selectedCat: any, date: string, events: any[], emotion: string) => {
     if (!selectedCat) return;
   
     setSaving(true);
     try {
-      const { day, diary } = await generateDiaryFromServer(events);
-      await saveDiaryToFirestore(selectedCat.id, day, diary);
-      await fetchTodayDiary(); // 저장 후 오늘 일기 다시 불러오기
-      alert('오늘 일기가 저장되었습니다!');
-
-      // ✅ 저장 완료 후 부드럽게 스크롤 이동
-      setTimeout(() => {
-        todayDiaryRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 300); // 약간 딜레이 주면 더 부드러움
-    } catch (error) {
-      console.error('에러 발생:', error);
-      alert('일기 생성 또는 저장 실패');
+      const response = await fetch("http://localhost:4000/generate-diary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, events, emotion })
+      });
+  
+      const data = await response.json();
+      const diaryContent = data.diary;
+  
+      await saveDiaryToFirestore(selectedCat.id, date, diaryContent);
+      await fetchTodayDiary();
+      await fetchDiaries(); // 전체 일기 목록 갱신
+      alert("오늘 일기가 저장되었습니다!");
+    } catch (err) {
+      console.error(err);
+      alert("일기 생성 또는 저장 실패");
     } finally {
       setSaving(false);
     }
-  };  
+  };   */}
+
+  const generateAndSaveDiary = async (selectedCat: any) => {
+    if (!selectedCat) return;
+  
+    setSaving(true);
+    try {
+      const { date, content } = await getTodayDiaryContent();
+  
+      await saveDiaryToFirestore(selectedCat.id, date, content); // ✅ Firestore에 저장
+      await fetchTodayDiary();
+      await fetchDiaries();
+  
+      alert('오늘 일기가 저장되었습니다!');
+    } catch (err) {
+      console.error(err);
+      alert('일기 저장 실패');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const fetchDiaries = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser || !selectedCat) return;
+  
+    const q = collection(db, 'users', currentUser.uid, 'cats', selectedCat.id, 'diaries');
+    const snapshot = await getDocs(q);
+  
+    const diaryList = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        day: data.day ?? doc.id,     // ✅ day가 없으면 fallback
+        diary: data.diary ?? '',     // ✅ 안전하게 처리
+      };
+    });
+  
+    diaryList.sort((a, b) => b.day.localeCompare(a.day));
+    setDiaries(diaryList);
+  };
+  
 
   const startTest = () => {
     setIsTesting(true);
@@ -467,9 +519,9 @@ const Home = () => {
             {!isTodayDiarySaved && (
               <div className="flex justify-center mt-6 mb-6">
                 <button
-                  onClick={() => generateAndSaveDiary(selectedCat, events)}
+                  onClick={() => generateAndSaveDiary(selectedCat)}
                   disabled={saving}
-                  className="w-[240px] h-[40px] px-6 py-2 bg-white text-[#5976D7] font-apple_bold text-sm rounded-full shadow hover:scale-105 transition"
+                  className="w-[280px] h-[50px] px-6 py-2 bg-white text-[#3958bd] font-apple_bold text-sm rounded-full shadow hover:scale-105 transition"
                 >
                   {saving ? "저장 중..." : "오늘 일기 자동 생성하기"}
                 </button>
